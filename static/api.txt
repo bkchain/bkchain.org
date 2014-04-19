@@ -1,0 +1,20 @@
+bkchain.org JSON API
+
+Blocks:
+- $currency/api/v1/block/hash/$block_hash
+- $currency/api/v1/block/index/$block_index
+- $currency/api/v1/block/height/$block_height
+
+Transactions:
+- $currency/api/v1/tx/hash/$tx_hash
+- $currency/api/v1/tx/index/$tx_index
+
+Address:
+- $currency/api/v1/address/balance/$address
+- $currency/api/v1/address/balance/$address?confirmations=3 (just include change that have at least 3 confirmations; default=1)
+- $currency/api/v1/address/unspent/$address
+
+Notes:
+- Block and transaction indices are database specific.
+- They might change later when database is regenerated.
+- All results are given in satoshi for coins and satoshi.second for coinage.

@@ -1,0 +1,66 @@
+    <div class='tx-sm'>
+      <div class='tx-sm-caption text-left'>
+        <div>
+          <a class="hash" href='{{=it.script_name}}/tx/{{= it.transaction.hash }}'>{{= it.transaction.hash }}</a>
+          <div class='pull-right'><b>Size:</b> {{= it.transaction.size }} bytes &nbsp;{{? (it.transaction.out - it.transaction.in > 0) }}Generated: {{= (it.transaction.out - it.transaction.in) / it.coin_factor }}{{??}}<b>Fees:</b> {{= (it.transaction.in - it.transaction.out) / it.coin_factor }}{{?}} {{=it.currency_short}}</div>
+        </div>
+        <div>
+          <b>{{= it.transaction.time }}</b>
+          <div class='pull-right'><b>Coinage destroyed:</b> {{= (it.transaction.coinage_destroyed / it.coin_factor).toFixed(6) }} {{=it.currency_short}} days</div>
+        </div>
+      </div>
+      <div class="row">
+      <div class="col-md-6">
+        <table class='table table-condensed table-striped'>
+{{ for (var input_index in it.transaction.ins) { var input = it.transaction.ins[input_index]; }}
+            <tr>
+{{? (input.addr == 'pow') }}
+                <td class="text-left">New Coins (Mining)</td>
+                <td class="text-right">{{= input.v / it.coin_factor }} {{=it.currency_short}}</td>
+{{?? (input.addr == 'pos') }}
+                <td class="text-left">New Coins (Proof of Stake)</td>
+                <td class="text-right">{{= input.v / it.coin_factor }} {{=it.currency_short}}</td>
+{{?? (input.addr == 'None') }}
+                <td class="text-left">None</td>
+                <td class="text-right">{{= input.v / it.coin_factor }} {{=it.currency_short}}</td>
+{{??}}
+                <td class="text-left"><a href='{{=it.script_name}}/address/{{= input.addr }}'>{{= input.addr }}</a></td>
+                <td class="text-right"><a href='{{=it.script_name}}/tx/{{= input.tx }}#o{{= input.txi }}'>{{= input.v / it.coin_factor }} {{=it.currency_short}}</a></td>
+{{?}}
+            </tr>
+{{ } }}
+            <tr>
+                <td class="text-left"></td>
+                <td class="text-right">{{= it.transaction.in / it.coin_factor }} {{=it.currency_short}}</td>
+            </tr>
+        </table>
+      </div>
+      <!--<div class="col-md-2"><img src='{{=it.source_base}}/static/arrow.png' /></div>-->
+      <div class="col-md-6">
+        <table class="table table-condensed table-striped">
+{{ for (var output_index in it.transaction.outs) { var output = it.transaction.outs[output_index]; }}
+            <tr>
+{{? (output.addr == 'None') }}
+ {{? (it.transaction.ins.length > 0 && it.transaction.ins[0].addr == 'pos') }}
+                <td class="text-left">See details in next transaction</td>
+ {{??}}
+                <td class="text-left">None</td>
+ {{?}}
+{{??}}
+                <td class="text-left"><a href='{{=it.script_name}}/address/{{= output.addr }}'>{{= output.addr }}</a></td>
+{{?}}
+{{? output.tx }}
+                <td class="text-right"><a href='{{=it.script_name}}/tx/{{= output.tx }}#i{{= output.txi }}'>{{= output.v / it.coin_factor }} {{=it.currency_short}}</a></td>
+{{??}}
+                <td class="text-right">{{= output.v / it.coin_factor }} {{=it.currency_short}}</td>
+{{?}}
+            </tr>
+{{ } }}
+            <tr>
+                <td class="text-left"></td>
+                <td class="text-right">{{= it.transaction.out / it.coin_factor }} {{=it.currency_short}}</td>
+            </tr>
+        </table>
+      </div>
+      </div>
+    </div>

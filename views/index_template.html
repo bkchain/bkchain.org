@@ -1,0 +1,44 @@
+<div>
+  <table class="table table-condensed table-striped">
+    <thead>
+      <tr>
+        <th class="text-center">Live transactions</th>
+        <th class="text-center">Age</th>
+        <th class="text-center">Total Sent<br/>({{=it.currency_short}})</th>
+        <th class="text-center">Destroyed<br/>({{=it.currency_short}} days)</th>
+      </tr>
+    </thead>
+    <tbody id="livetx">
+  {{ for(var prop in it.latest_transactions) { it.tx = it.latest_transactions[prop]; }}
+       {{#def.loadfile('/views/livetx.html')}}
+  {{ } }}
+    </tbody>
+  </table>
+</div>
+
+<br style='clear:both;'/>
+
+<div>
+  <table class="table table-condensed table-striped">
+	<thead><tr>
+		<th class="text-center">Height</th>
+{{ if (it.proofofstake !== undefined) { }}
+        <th class="text-center">Type</th>
+{{ } }}
+		<th class="text-center">Age</th>
+		<th class="text-center">Size<br/>(bytes)</th>
+		<th class="text-center">Tx<br/>Count</th>
+		<th class="text-center">Total Sent<br/>({{=it.currency_short}})</th>
+        <th class="text-center">Destroyed<br/>({{=it.currency_short}} days)</th>
+{{ if (it.proofofstake !== undefined) { }}
+        <th class="text-center">Staked<br/>({{=it.currency_short}})</th>
+{{ } }}
+		<th class="text-center">Reward<br/>({{=it.currency_short}})</th>
+	</tr></thead>
+	<tbody id="liveblock">
+  {{ for(var prop in it.blocks) { it.block = it.blocks[prop]; }}
+       {{#def.loadfile('/views/liveblock.html')}}
+  {{ } }}
+    </tbody>
+  </table>
+</div>

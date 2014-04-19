@@ -1,0 +1,623 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta keywords="undefined BTC block explorer chain blockchain cryptocurrency cryptocoin">
+
+
+    <meta name="description" content="bkchain explorer">
+    <title>bkchain explorer</title>
+
+    
+    <script src="./static/js/jquery-2.1.0.min.js" type="text/javascript"></script>
+    <script src="./static/js/jquery.timeago.js" type="text/javascript"></script>
+    <link href="./static/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="./static/css/jquery.treetable.css" rel="stylesheet"/>
+    
+    <script src="./static/js/bootstrap.js"></script>
+    
+    <script type="text/javascript">
+      $(document).ready(function() {
+        $("abbr.timeago").timeago();
+        $("[rel='tooltip']").tooltip();
+      });
+      
+      // Setup jQuery.timeago
+      jQuery.timeago.settings.strings.suffixAgo = null;
+      jQuery.timeago.settings.strings.seconds = "< 1 minute";
+      jQuery.timeago.settings.strings.minute = "1 minute";
+      jQuery.timeago.settings.strings.minutes = "%d minutes";
+      jQuery.timeago.settings.strings.hour = "1 hour";
+      jQuery.timeago.settings.strings.hours = "%d hours";
+      jQuery.timeago.settings.strings.day = "a day";
+      jQuery.timeago.settings.strings.days = "%d days";
+      jQuery.timeago.settings.strings.month = "a month";
+      jQuery.timeago.settings.strings.months = "%d months";
+      jQuery.timeago.settings.strings.year = "a year";
+      jQuery.timeago.settings.strings.years = "%d years";
+    </script>
+    
+
+
+
+<script src="./static/js/qrcode.js"></script>
+
+
+    <style>
+@media (max-width: 767px) {
+  .navbar-nav .open .dropdown-menu {
+    position: absolute;
+  }
+  body {
+    font-size: 13px;
+  }
+  
+  .hash {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+    width: 350px;
+  }
+}
+
+#form-pass {
+  width: 680px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 40px;
+  margin-bottom: 40px;
+  border-width: 1px;
+  border-color: #ddd;
+  border-style: solid;
+  border-radius: 4px;
+  padding: 15px;
+}
+
+#form-pass #electrum-seed {
+  width: 400px;
+}
+
+#form-pass button {
+  width: 120px;
+}
+
+#form-pass .progress {
+  margin-top: 20px;
+  margin-bottom: 5px;
+}
+
+#form-pass #electrum-generated-seed {
+  width: 640px;
+  margin-top: 20px;
+  margin-bottom: 5px;
+}
+
+.nav .nav-header {
+    cursor: default;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.glyphicon-refresh-animate {
+    -webkit-animation:spin 4s linear infinite;
+    -moz-animation:spin 4s linear infinite;
+    animation:spin 4s linear infinite;
+}
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
+@media (max-width: 480px) {
+  .hash {
+    width: 200px;
+  }
+}
+
+/* Space out content a bit */
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+td {
+  white-space: nowrap;
+}
+
+/* Custom page header */
+.header {
+  border-bottom: 2px solid #e5e5e5;
+}
+
+/* Customize container */
+@media (min-width: 1000px) {
+  .container {
+    max-width: 970px;
+  }
+}
+
+/* Make the masthead heading the same height as the navigation */
+.header h3 {
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 40px;
+  padding-bottom: 6px;
+}
+
+    #wrapper {
+        padding: 40px 0px 0px 0px;
+        text-align: left;
+		//width: 970px;   
+		//margin-left: auto;
+		//margin-right: auto; 	
+    	//padding: 16px;
+        //min-height: 100%;
+    }
+
+    a:link { text-decoration: none; color: #00308C; }
+    a:visited { text-decoration: none; color: #5A14FF; }
+    a:hover { text-decoration: none; color: #37BE00; }
+
+    h1 { display : inline; font-weight: normal; font-size: 14px; }
+
+    #header { height: 52px; font-size: 12px; margin-bottom: 20px; padding-bottom:8px; border-bottom: 1px solid #ccc; }
+    #header-nav { float: right; }
+    #header-menu { float: left; margin-top: 2px; clear:left; }
+    .logo { float: left; }
+    #footer { text-align: center; }
+
+    .tx-vin { margin-right: -5%; }
+    .tx-vout { margin-left: -5%; }
+
+    .tx-list { margin-top: 32px; }
+
+    .tx-separator {  padding: -30px 10px -30px 10px; float: left; }
+
+    .tx-sm { width: 970px; border: 2px solid #ddd; padding: 4px; margin-bottom: 6px;}
+    .tx-sm-caption { width: 962px; background-color: #E8E8E8; padding: 6px; border-bottom: 2px solid #ddd; }
+
+    .addr-caption { font-size: 16px; font-weight: bold; }
+
+    .pos { color: #03700C; }
+    .neg { color: #9C0800; }
+    
+    .search-area { margin-top: -6px; }
+    #search { width: 430px; }
+
+    .error { background-color: #FFE3EE; width: 300px; margin: 64px;   border: 1px solid #aaa; box-shadow: 2px 2px 2px #aaa; padding: 16px; text-align: center; }
+    
+    .navbar-main
+    {
+        float: left;
+        margin-top: 5px;
+    }
+
+table.treetable tr.collapsed span.indenter a {
+  background-image: url(data:image/png;base64,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);
+}
+
+table.treetable tr.expanded span.indenter a {
+  background-image: url(data:image/png;base64,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);
+}
+    
+    </style>
+
+    <!--<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-46282374-1', 'bkchain.org');
+  ga('send', 'pageview');
+
+    </script>-->
+
+</head>
+<body>
+
+<nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+
+    <div class="container-fluid" id="navbar_content">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#mainNav">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a href="#/btc" class="navbar-brand">bkchain</a>
+        <div class="navbar-main">
+          <ul class="nav nav-pills list-inline">
+            <li class="dropdown" id="navbar_currency_dropdown">
+              <a href="#/btc" class="dropdown-toggle" data-toggle="dropdown">undefined <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li class="active"><a href="#/btc">Bitcoin</a></li>
+                <li><a href="#/ltc">Litecoin</a></li>
+                <li><a href="#/ppc">Peercoin</a></li>
+                <li><a href="#/doge">Dogecoin</a></li>
+              </ul>
+            </li>
+
+            <li><a href="wallet_btc.html">Wallet <span class="label label-danger">alpha</span></a></li>
+
+          </ul>
+        </div>
+      </div>
+      <div class="collapse navbar-collapse" id="mainNav">
+
+        <form class="navbar-form navbar-right form-inline" method="post" onsubmit="main_search(); return false;">
+
+          <div class="form-group"><input type="text" class="form-control" id="search" name="search" placeholder="block id, block hash, transaction hash or address (BTC)"/></div>
+          <button type="submit" class="btn btn-success">Search</button>
+        </form>
+      </div>
+    </div>
+</nav>
+    
+<div class='container'>
+    <div id='wrapper'>
+
+<div id="content">Loading...</div>
+<script src="./static/js/async.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var livetxTemplate = function anonymous(it) {
+var out='      <tr>\r\n\t    <td class="text-left"><a href=\''+(it.script_name)+'/tx/'+( it.tx.hash )+'\'>'+( it.tx.hash.substring(0, 20) + '...' )+'</a></td>\r\n\t    <td class="text-center"><abbr class="timeago" rel="tooltip" data-animation="false" title="'+( it.tx.time )+'Z">'+( it.tx.time )+' UTC</abbr></td>\r\n\t    <td class="text-right">'+( it.tx.output / it.coin_factor )+'</td>\r\n\t    <td class="text-right">'+( (it.tx.coinage_destroyed / it.coin_factor).toFixed(2) )+'</td>\r\n      </tr>';return out;
+}
+    var liveblockTemplate = function anonymous(it) {
+var out='      <tr>\r\n\t\t<td class="text-center"><a href=\''+(it.script_name)+'/block/'+( it.block.hash )+'\'>'+( it.block.height )+'</a></td>\r\n'; if (it.proofofstake !== undefined) { out+='\r\n        <td class="text-center">'+( it.block.type )+'</td>\r\n'; } out+='\r\n\t\t<td class="text-center"><abbr class="timeago" rel="tooltip" data-animation="false" title="'+( it.block.time )+'Z">'+( it.block.time )+' UTC</abbr></td>\r\n\t\t<td class="text-center">'+( it.block.size )+'</td>\r\n\t\t<td class="text-center">'+( it.block.txcount )+'</td>\r\n\t\t<td class="text-right">'+( (it.block.out / it.coin_factor).toFixed(2) )+'</td>\r\n        <td class="text-right">'+( (it.block.coinage_destroyed / it.coin_factor).toFixed(2) )+'</td>\r\n'; if (it.proofofstake !== undefined) { out+='\r\n'; if (it.block.type == 'pos') { out+='\r\n        <td class="text-right">'+( (it.block.stake_amount / it.coin_factor).toFixed(2) )+'</td>\r\n'; } else { out+='\r\n        <td class="text-right">N/A</td>\r\n'; } out+='\r\n'; } out+='\r\n\t\t<td class="text-right">'+( (it.block.reward / it.coin_factor).toFixed(2) )+'</td>\r\n      </tr>';return out;
+}
+
+    var livetx;
+    var liveblock;
+    function setupLiveIndex(data)
+    {
+        livetx = document.getElementById("livetx");
+        liveblock = document.getElementById("liveblock");
+        websocket = new WebSocket("ws://127.0.0.1:9352/livetx");
+        websocket.onopen = function(evt) { websocket.send(JSON.stringify({ subscribe: 'livetx' })); };
+        websocket.onerror = function(evt) { };
+        websocket.onmessage = function(evt) { writeToScreen(data, JSON.parse(evt.data)); };
+        
+        // Remove text nodes to have a clean childNodes list
+        for(var i=0;i<livetx.childNodes.length;i++)
+        {
+          if(livetx.childNodes[i].nodeType==3)
+            livetx.removeChild(livetx.childNodes[i--]);
+          else
+            continue;
+        }
+
+        // Remove text nodes to have a clean childNodes list
+        for(var i=0;i<liveblock.childNodes.length;i++)
+        {
+          if(liveblock.childNodes[i].nodeType==3)
+            liveblock.removeChild(liveblock.childNodes[i--]);
+          else
+            continue;
+        }
+    }
+ function writeToScreen(data, message)
+ {
+   var pre = document.createElement("tr");
+   
+   var itemtype = message['item'];
+   var output;
+   var maxItems;
+   
+
+   var data2 = {
+     coin_factor: data.coin_factor,
+     script_name: data.script_name,
+   };
+
+
+   // TODO: Switch to jquery
+   if (itemtype == 'tx')
+   {
+     data2.tx = message;
+     pre.innerHTML = livetxTemplate(data2);
+     output = livetx;
+     maxItems = 10;
+   }
+//{% if (page == 0) %}   
+   else if (itemtype == 'block')
+   {
+     data2.block = message;
+     pre.innerHTML = liveblockTemplate(data2);
+     output = liveblock;
+     maxItems = 20;
+   }
+//{% endif %}
+   else
+   {
+     return;
+   }
+   
+   while (output.childNodes.length >= maxItems)
+    output.removeChild(output.childNodes[output.childNodes.length - 1]);
+
+   // If last row was not grey, this one will be
+   //var classAttributes = "blocklist-row";
+   //if (output.childNodes.length > 1 && output.childNodes[1].getAttribute("class").indexOf('row-grey') == -1)
+   //  classAttributes += " row-grey";
+   //pre.setAttribute("class", classAttributes);
+   
+   
+   if (output.childNodes.length > 1)
+    output.insertBefore(pre, output.childNodes[0]);
+   else
+    output.appendChild(pre);
+    
+   $("abbr.timeago").timeago();
+ }
+
+</script>
+<script type="text/javascript">
+  var current_currency;
+  var query_api = function(request,cb){
+    var payload = {'method': request['method'], 'id': 1, 'jsonrpc': 1, 'params': request['params']};
+    $.post('https://bkchain.org/api/raw/' + request['currency'], JSON.stringify(payload), function(body){
+      cb(null, body);
+    });
+  };
+  
+  // Get templates (generated by doT.js)
+  var navbarTemplate = function anonymous(it) {
+var out='      <div class="navbar-header">\r\n        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#mainNav">\r\n          <span class="sr-only">Toggle navigation</span>\r\n          <span class="icon-bar"></span>\r\n          <span class="icon-bar"></span>\r\n          <span class="icon-bar"></span>\r\n        </button>\r\n        <a href="'+(it.script_name)+'" class="navbar-brand">bkchain</a>\r\n        <div class="navbar-main">\r\n          <ul class="nav nav-pills list-inline">\r\n            <li class="dropdown" id="navbar_currency_dropdown">\r\n              <a href="'+(it.script_name)+'" class="dropdown-toggle" data-toggle="dropdown">'+(it.currency)+' <b class="caret"></b></a>\r\n              <ul class="dropdown-menu">\r\n                <li';if(''+(it.currency_short) == 'BTC'){out+=' class="active"';}out+='><a href="'+(it.script_name_base)+'/btc">Bitcoin</a></li>\r\n                <li';if(''+(it.currency_short) == 'LTC'){out+=' class="active"';}out+='><a href="'+(it.script_name_base)+'/ltc">Litecoin</a></li>\r\n                <li';if(''+(it.currency_short) == 'PPC'){out+=' class="active"';}out+='><a href="'+(it.script_name_base)+'/ppc">Peercoin</a></li>\r\n                <li';if(''+(it.currency_short) == 'DOGE'){out+=' class="active"';}out+='><a href="'+(it.script_name_base)+'/doge">Dogecoin</a></li>\r\n              </ul>\r\n            </li>\r\n'; if (undefined) { out+='\r\n            <li><a href="#">Wallet <span class="label label-danger">alpha</span></a></li>\r\n'; } else if (true) { out+='\r\n            <li><a href="wallet_'+(it.currency_short.toLowerCase())+'.html">Wallet <span class="label label-danger">alpha</span></a></li>\r\n'; } else { out+='\r\n            <li><a href="'+(it.script_name)+'/wallet">Wallet <span class="label label-danger">exp</span></a></li>\r\n'; } out+='\r\n          </ul>\r\n        </div>\r\n      </div>\r\n      <div class="collapse navbar-collapse" id="mainNav">\r\n'; if (true) { out+='\r\n        <form class="navbar-form navbar-right form-inline" method="post" onsubmit="main_search(); return false;">\r\n'; } else { out+='\r\n        <form class="navbar-form navbar-right form-inline" method="get" action="'+(it.script_name)+'/search">\r\n'; } out+='\r\n          <div class="form-group"><input type="text" class="form-control" id="search" name="search" placeholder="block id, block hash, transaction hash or address ('+(it.currency_short)+')"/></div>\r\n          <button type="submit" class="btn btn-success">Search</button>\r\n        </form>\r\n      </div>';return out;
+};
+  var indexTemplate = function anonymous(it) {
+var out='<div>\r\n  <table class="table table-condensed table-striped">\r\n    <thead>\r\n      <tr>\r\n        <th class="text-center">Live transactions</th>\r\n        <th class="text-center">Age</th>\r\n        <th class="text-center">Total Sent<br/>('+(it.currency_short)+')</th>\r\n        <th class="text-center">Destroyed<br/>('+(it.currency_short)+' days)</th>\r\n      </tr>\r\n    </thead>\r\n    <tbody id="livetx">\r\n  '; for(var prop in it.latest_transactions) { it.tx = it.latest_transactions[prop]; out+='\r\n             <tr>\r\n\t    <td class="text-left"><a href=\''+(it.script_name)+'/tx/'+( it.tx.hash )+'\'>'+( it.tx.hash.substring(0, 20) + '...' )+'</a></td>\r\n\t    <td class="text-center"><abbr class="timeago" rel="tooltip" data-animation="false" title="'+( it.tx.time )+'Z">'+( it.tx.time )+' UTC</abbr></td>\r\n\t    <td class="text-right">'+( it.tx.output / it.coin_factor )+'</td>\r\n\t    <td class="text-right">'+( (it.tx.coinage_destroyed / it.coin_factor).toFixed(2) )+'</td>\r\n      </tr>\r\n  '; } out+='\r\n    </tbody>\r\n  </table>\r\n</div>\r\n\r\n<br style=\'clear:both;\'/>\r\n\r\n<div>\r\n  <table class="table table-condensed table-striped">\r\n\t<thead><tr>\r\n\t\t<th class="text-center">Height</th>\r\n'; if (it.proofofstake !== undefined) { out+='\r\n        <th class="text-center">Type</th>\r\n'; } out+='\r\n\t\t<th class="text-center">Age</th>\r\n\t\t<th class="text-center">Size<br/>(bytes)</th>\r\n\t\t<th class="text-center">Tx<br/>Count</th>\r\n\t\t<th class="text-center">Total Sent<br/>('+(it.currency_short)+')</th>\r\n        <th class="text-center">Destroyed<br/>('+(it.currency_short)+' days)</th>\r\n'; if (it.proofofstake !== undefined) { out+='\r\n        <th class="text-center">Staked<br/>('+(it.currency_short)+')</th>\r\n'; } out+='\r\n\t\t<th class="text-center">Reward<br/>('+(it.currency_short)+')</th>\r\n\t</tr></thead>\r\n\t<tbody id="liveblock">\r\n  '; for(var prop in it.blocks) { it.block = it.blocks[prop]; out+='\r\n             <tr>\r\n\t\t<td class="text-center"><a href=\''+(it.script_name)+'/block/'+( it.block.hash )+'\'>'+( it.block.height )+'</a></td>\r\n'; if (it.proofofstake !== undefined) { out+='\r\n        <td class="text-center">'+( it.block.type )+'</td>\r\n'; } out+='\r\n\t\t<td class="text-center"><abbr class="timeago" rel="tooltip" data-animation="false" title="'+( it.block.time )+'Z">'+( it.block.time )+' UTC</abbr></td>\r\n\t\t<td class="text-center">'+( it.block.size )+'</td>\r\n\t\t<td class="text-center">'+( it.block.txcount )+'</td>\r\n\t\t<td class="text-right">'+( (it.block.out / it.coin_factor).toFixed(2) )+'</td>\r\n        <td class="text-right">'+( (it.block.coinage_destroyed / it.coin_factor).toFixed(2) )+'</td>\r\n'; if (it.proofofstake !== undefined) { out+='\r\n'; if (it.block.type == 'pos') { out+='\r\n        <td class="text-right">'+( (it.block.stake_amount / it.coin_factor).toFixed(2) )+'</td>\r\n'; } else { out+='\r\n        <td class="text-right">N/A</td>\r\n'; } out+='\r\n'; } out+='\r\n\t\t<td class="text-right">'+( (it.block.reward / it.coin_factor).toFixed(2) )+'</td>\r\n      </tr>\r\n  '; } out+='\r\n    </tbody>\r\n  </table>\r\n</div>';return out;
+};
+  var blockTemplate = function anonymous(it) {
+var out='<div class="row">\r\n<div class="col-md-5">\r\n<table class="table table-condensed table-striped">\r\n  <thead>\r\n    <th colspan=\'2\'>Block #'+( it.block.height )+'</th>\r\n  </thead>\r\n  <tbody>\r\n  <tr>\r\n    <td>Type:</td>\r\n    <td>';if(it.block.type == "pos"){out+='Proof of Stake';}else{out+='Proof of Work';}out+='</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Confirmations:</td>\r\n    <td>';if(it.block.main_chain){out+=( it.block.confirmations );}else{out+='<span class=\'neg\'>Orphaned</span>';}out+='</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Size:</td>\r\n    <td>'+( it.block.size )+' bytes</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Height:</td>\r\n    <td>'+( it.block.height )+' ';if(it.block.main_chain){out+='<span class=\'pos\'>(Longest chain)</span>';}else{out+='<span class=\'neg\'>(Orphaned)</span>';}out+='</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Version:</td>\r\n    <td>'+( it.block.ver )+'</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Time:</td>\r\n    <td>'+( it.block.time )+'</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Nonce:</td>\r\n    <td>'+( it.block.nonce.toString(16) )+'</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Bits:</td>\r\n    <td>'+( it.block.bits.toString(16) )+'</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Difficulty:</td>\r\n    <td>'+( it.block.diff.toFixed(8) )+'</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Transactions:</td>\r\n    <td>'+( it.block.txcount )+'</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Input:</td>\r\n    <td>'+( it.block.in / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Output:</td>\r\n    <td>'+( it.block.out / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Reward:</td>\r\n    <td>'+( it.block.reward / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Fees:</td>\r\n    <td>'+( (it.block.in - it.block.out) / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Coin age destroyed:</td>\r\n    <td>'+( (it.block.coinage_destroyed / it.coin_factor).toFixed(6) )+' '+(it.currency_short)+' days</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Average coin age:</td>\r\n    <td>'+( it.block.avg_coinage.toFixed(6) )+' days</td>\r\n  </tr>\r\n  </tbody>\r\n</table>\r\n</div>\r\n<div class="col-md-7">\r\n<table class="table table-condensed table-striped">\r\n  <thead>\r\n    <th colspan=\'2\'>Hashes</th>\r\n  </thead>\r\n  <tbody>\r\n  <tr>\r\n    <td>Hash:</td>\r\n    <td><div class="hash">'+( it.block.hash )+'</div></td>\r\n  </tr>\r\n  <tr>\r\n    <td>Previous:</td>\r\n    <td><a class="hash" href=\''+(it.script_name)+'/block/'+( it.block.prev )+'\'>'+( it.block.prev )+'</a></td>\r\n  </tr>\r\n  <tr>\r\n    <td>Next(s):</td>\r\n    <td>\r\n';var arr1=it.block.nexts;if(arr1){var value,index=-1,l1=arr1.length-1;while(index<l1){value=arr1[index+=1];out+='\r\n      <a class="hash" href=\''+(it.script_name)+'/block/'+(value)+'\'>'+(value)+'</a>\r\n';} } out+='\r\n    </td>\r\n  </tr>\r\n  <tr>\r\n    <td>Merkle:</td>\r\n    <td><div class="hash">'+( it.block.merkle )+'</div></td>\r\n  </tr>\r\n  </tbody>\r\n</table>\r\n</div>\r\n</div>\r\n\r\n\r\n<p style=\'clear:both;\'/>\r\n<div class=\'tx-list\'>\r\n';var arr2=it.block.transactions;if(arr2){var value,index=-1,l2=arr2.length-1;while(index<l2){value=arr2[index+=1];out+='\r\n  '; it.transaction = value; out+='\r\n      <div class=\'tx-sm\'>\r\n      <div class=\'tx-sm-caption text-left\'>\r\n        <div>\r\n          <a class="hash" href=\''+(it.script_name)+'/tx/'+( it.transaction.hash )+'\'>'+( it.transaction.hash )+'</a>\r\n          <div class=\'pull-right\'><b>Size:</b> '+( it.transaction.size )+' bytes &nbsp;';if((it.transaction.out - it.transaction.in > 0)){out+='Generated: '+( (it.transaction.out - it.transaction.in) / it.coin_factor );}else{out+='<b>Fees:</b> '+( (it.transaction.in - it.transaction.out) / it.coin_factor );}out+=' '+(it.currency_short)+'</div>\r\n        </div>\r\n        <div>\r\n          <b>'+( it.transaction.time )+'</b>\r\n          <div class=\'pull-right\'><b>Coinage destroyed:</b> '+( (it.transaction.coinage_destroyed / it.coin_factor).toFixed(6) )+' '+(it.currency_short)+' days</div>\r\n        </div>\r\n      </div>\r\n      <div class="row">\r\n      <div class="col-md-6">\r\n        <table class=\'table table-condensed table-striped\'>\r\n'; for (var input_index in it.transaction.ins) { var input = it.transaction.ins[input_index]; out+='\r\n            <tr>\r\n';if((input.addr == 'pow')){out+='\r\n                <td class="text-left">New Coins (Mining)</td>\r\n                <td class="text-right">'+( input.v / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n';}else if((input.addr == 'pos')){out+='\r\n                <td class="text-left">New Coins (Proof of Stake)</td>\r\n                <td class="text-right">'+( input.v / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n';}else if((input.addr == 'None')){out+='\r\n                <td class="text-left">None</td>\r\n                <td class="text-right">'+( input.v / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n';}else{out+='\r\n                <td class="text-left"><a href=\''+(it.script_name)+'/address/'+( input.addr )+'\'>'+( input.addr )+'</a></td>\r\n                <td class="text-right"><a href=\''+(it.script_name)+'/tx/'+( input.tx )+'#o'+( input.txi )+'\'>'+( input.v / it.coin_factor )+' '+(it.currency_short)+'</a></td>\r\n';}out+='\r\n            </tr>\r\n'; } out+='\r\n            <tr>\r\n                <td class="text-left"></td>\r\n                <td class="text-right">'+( it.transaction.in / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n            </tr>\r\n        </table>\r\n      </div>\r\n      <!--<div class="col-md-2"><img src=\''+(it.source_base)+'/static/arrow.png\' /></div>-->\r\n      <div class="col-md-6">\r\n        <table class="table table-condensed table-striped">\r\n'; for (var output_index in it.transaction.outs) { var output = it.transaction.outs[output_index]; out+='\r\n            <tr>\r\n';if((output.addr == 'None')){out+='\r\n ';if((it.transaction.ins.length > 0 && it.transaction.ins[0].addr == 'pos')){out+='\r\n                <td class="text-left">See details in next transaction</td>\r\n ';}else{out+='\r\n                <td class="text-left">None</td>\r\n ';}out+='\r\n';}else{out+='\r\n                <td class="text-left"><a href=\''+(it.script_name)+'/address/'+( output.addr )+'\'>'+( output.addr )+'</a></td>\r\n';}out+='\r\n';if(output.tx){out+='\r\n                <td class="text-right"><a href=\''+(it.script_name)+'/tx/'+( output.tx )+'#i'+( output.txi )+'\'>'+( output.v / it.coin_factor )+' '+(it.currency_short)+'</a></td>\r\n';}else{out+='\r\n                <td class="text-right">'+( output.v / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n';}out+='\r\n            </tr>\r\n'; } out+='\r\n            <tr>\r\n                <td class="text-left"></td>\r\n                <td class="text-right">'+( it.transaction.out / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n            </tr>\r\n        </table>\r\n      </div>\r\n      </div>\r\n    </div>\r\n\r\n';} } out+='\r\n</div>\r\n<p/>\r\n\r\n<div style=\'white-space:pre;\'>\r\n \r\n</div>';return out;
+};
+  var transactionTemplate = function anonymous(it) {
+var out='<div class="row">\r\n<div class="col-md-5">\r\n<table class="table table-condensed table-striped">\r\n  <thead>\r\n    <th colspan=\'2\'>Transaction</th>\r\n  </thead>\r\n  <tbody>\r\n  <tr>\r\n    <td>Confirmations:</td>\r\n    <td>\r\n        ';if(it.transaction.blocks.length == 0){out+='<span class=\'neg\'>Unconfirmed</span>\r\n        ';}else if(!it.transaction.main_chain){out+='<span class=\'neg\'>Orphaned</span>\r\n        ';}else if(it.transaction.confirmed){out+='<span class=\'pos\'>'+( it.transaction.confirmations )+'</span>\r\n        ';}else{out+=( it.transaction.confirmations )+'\r\n        ';}out+='\r\n    </td>\r\n  </tr>\r\n  <tr>\r\n    <td>Size:</td>\r\n    <td>'+( it.transaction.size )+' bytes</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Version:</td>\r\n    <td>'+( it.transaction.ver )+'</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Time:</td>\r\n    <td>'+( it.transaction.time )+'</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Input:</td>\r\n    <td>'+( it.transaction.in / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Output:</td>\r\n    <td>'+( it.transaction.out / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Fees:</td>\r\n    <td>';if((it.transaction.in - it.transaction.out > 0)){out+=' '+( (it.transaction.in - it.transaction.out) / it.coin_factor )+' ';}else{out+=' 0 ';}out+=' '+(it.currency_short)+'</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Coin age destroyed:</td>\r\n    <td>'+( it.transaction.coinage_destroyed / it.coin_factor )+' '+(it.currency_short)+' days</td>\r\n  </tr>\r\n  </tbody>\r\n</table>\r\n</div>\r\n<div class="col-md-7">\r\n<table class="table table-condensed table-striped">\r\n  <thead>\r\n    <th colspan=\'2\'>Hashes</th>\r\n  </thead>\r\n  <tbody>\r\n  <tr>\r\n    <td>Hash:</td>\r\n    <td><div class="hash">'+( it.transaction.hash )+'</div></td>\r\n  </tr>\r\n  <tr>\r\n    <td>Block(s):</td>\r\n    <td>\r\n';var arr1=it.transaction.blocks;if(arr1){var block,index=-1,l1=arr1.length-1;while(index<l1){block=arr1[index+=1];out+='\r\n      <a class="hash" href=\''+(it.script_name)+'/block/'+( block )+'\'>'+( block )+'</a>\r\n';} } out+='\r\n    </td>\r\n  </tr>\r\n  </tbody>\r\n</table>\r\n</div>\r\n</div>\r\n\r\n<p style=\'clear:both;\'/>\r\n<div class=\'tx-list\'>\r\n    <div class=\'tx-sm\'>\r\n      <div class=\'tx-sm-caption text-left\'>\r\n        <div>\r\n          <a class="hash" href=\''+(it.script_name)+'/tx/'+( it.transaction.hash )+'\'>'+( it.transaction.hash )+'</a>\r\n          <div class=\'pull-right\'><b>Size:</b> '+( it.transaction.size )+' bytes &nbsp;';if((it.transaction.out - it.transaction.in > 0)){out+='Generated: '+( (it.transaction.out - it.transaction.in) / it.coin_factor );}else{out+='<b>Fees:</b> '+( (it.transaction.in - it.transaction.out) / it.coin_factor );}out+=' '+(it.currency_short)+'</div>\r\n        </div>\r\n        <div>\r\n          <b>'+( it.transaction.time )+'</b>\r\n          <div class=\'pull-right\'><b>Coinage destroyed:</b> '+( (it.transaction.coinage_destroyed / it.coin_factor).toFixed(6) )+' '+(it.currency_short)+' days</div>\r\n        </div>\r\n      </div>\r\n      <div class="row">\r\n      <div class="col-md-6">\r\n        <table class=\'table table-condensed table-striped\'>\r\n'; for (var input_index in it.transaction.ins) { var input = it.transaction.ins[input_index]; out+='\r\n            <tr>\r\n';if((input.addr == 'pow')){out+='\r\n                <td class="text-left">New Coins (Mining)</td>\r\n                <td class="text-right">'+( input.v / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n';}else if((input.addr == 'pos')){out+='\r\n                <td class="text-left">New Coins (Proof of Stake)</td>\r\n                <td class="text-right">'+( input.v / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n';}else if((input.addr == 'None')){out+='\r\n                <td class="text-left">None</td>\r\n                <td class="text-right">'+( input.v / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n';}else{out+='\r\n                <td class="text-left"><a href=\''+(it.script_name)+'/address/'+( input.addr )+'\'>'+( input.addr )+'</a></td>\r\n                <td class="text-right"><a href=\''+(it.script_name)+'/tx/'+( input.tx )+'#o'+( input.txi )+'\'>'+( input.v / it.coin_factor )+' '+(it.currency_short)+'</a></td>\r\n';}out+='\r\n            </tr>\r\n'; } out+='\r\n            <tr>\r\n                <td class="text-left"></td>\r\n                <td class="text-right">'+( it.transaction.in / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n            </tr>\r\n        </table>\r\n      </div>\r\n      <!--<div class="col-md-2"><img src=\''+(it.source_base)+'/static/arrow.png\' /></div>-->\r\n      <div class="col-md-6">\r\n        <table class="table table-condensed table-striped">\r\n'; for (var output_index in it.transaction.outs) { var output = it.transaction.outs[output_index]; out+='\r\n            <tr>\r\n';if((output.addr == 'None')){out+='\r\n ';if((it.transaction.ins.length > 0 && it.transaction.ins[0].addr == 'pos')){out+='\r\n                <td class="text-left">See details in next transaction</td>\r\n ';}else{out+='\r\n                <td class="text-left">None</td>\r\n ';}out+='\r\n';}else{out+='\r\n                <td class="text-left"><a href=\''+(it.script_name)+'/address/'+( output.addr )+'\'>'+( output.addr )+'</a></td>\r\n';}out+='\r\n';if(output.tx){out+='\r\n                <td class="text-right"><a href=\''+(it.script_name)+'/tx/'+( output.tx )+'#i'+( output.txi )+'\'>'+( output.v / it.coin_factor )+' '+(it.currency_short)+'</a></td>\r\n';}else{out+='\r\n                <td class="text-right">'+( output.v / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n';}out+='\r\n            </tr>\r\n'; } out+='\r\n            <tr>\r\n                <td class="text-left"></td>\r\n                <td class="text-right">'+( it.transaction.out / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n            </tr>\r\n        </table>\r\n      </div>\r\n      </div>\r\n    </div>\r\n\r\n</div>\r\n<p/>\r\n\r\n<div style=\'white-space:pre;\'>\r\n \r\n</div>\r\n\r\n';return out;
+};
+  var addressTemplate = function anonymous(it) {
+var out='<div class="row">\r\n<div class="col-md-5">\r\n<table class="table table-condensed table-striped">\r\n  <thead>\r\n    <th colspan=\'2\'>Address</th>\r\n  </thead>\r\n  <tbody>\r\n  <tr>\r\n    <td>Balance:</td>\r\n    <td>'+( (it.address.total_output - it.address.total_input) / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Sent:</td>\r\n    <td>'+( it.address.total_input / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Received:</td>\r\n    <td>'+( it.address.total_output / it.coin_factor )+' '+(it.currency_short)+'</td>\r\n  </tr>\r\n  <tr>\r\n    <td>Transactions:</td>\r\n    <td>'+(it.address.txcount )+'</td>\r\n  </tr>\r\n  </tbody>\r\n</table>\r\n</div>\r\n\r\n<div class="col-md-5">\r\n  <span class=\'addr-caption\'> '+( it.address.addr )+' </span>\r\n  <hr/>\r\n  <div id="qrcode_public" class="qrcode_public"><canvas/></div>\r\n</div>\r\n\r\n<div>\r\n<table class="table table-condensed table-striped">\r\n  <thead>\r\n    <th class="text-center">Transaction</th>\r\n    <th class="text-center">Block</th>\r\n    <th class="text-center">Age</th>\r\n    <th class="text-center">Conf</th>\r\n    <th class="text-center">Amount</th>\r\n    <th class="text-center">Balance</th>\r\n  </thead>\r\n  <tbody>\r\n';var arr1=it.address.ops;if(arr1){var operation,index=-1,l1=arr1.length-1;while(index<l1){operation=arr1[index+=1];out+='\r\n    <tr>\r\n        <td><a href=\''+(it.script_name)+'/tx/'+( operation.txhash )+'\'>'+( operation.txhash.substring(0, 8) + '...' )+'</a></td>\r\n';if((operation.blockheight != -1)){out+='\r\n        <td><a href=\''+(it.script_name)+'/block/'+( operation.blockhash )+'\'>'+( operation.blockheight )+'</a></td>\r\n';}else{out+='\r\n        <td>Mempool</td>\r\n';}out+='\r\n        <td><abbr class="timeago" rel="tooltip" data-animation="false" title="'+( operation.time )+'Z">'+( operation.time )+' UTC</abbr></td>\r\n        <td>\r\n            ';if((operation.blockheight == -1)){out+='<span class=\'neg\'>0</span>\r\n            ';}else if((!operation.main_chain)){out+='<span class=\'neg\'>Orph.</span>\r\n            ';}else if((operation.confirmed)){out+='<span class=\'pos\'>'+( operation.confirmations )+'</span>\r\n            ';}else{out+=' '+( operation.confirmations )+'\r\n            ';}out+='\r\n        </td>\r\n        <td class="text-right">';if(((operation.output - operation.input) < 0)){out+='<span class=\'neg\'>';if((operation.blockheight != -1 && !operation.main_chain)){out+='<strike>';}out+=( (operation.output - operation.input) / it.coin_factor );if((operation.blockheight != -1 && !operation.main_chain)){out+='</strike>';}out+='</span>\r\n        ';}else{out+='<span class=\'pos\'>';if((operation.blockheight != -1 && !operation.main_chain)){out+='<strike>';}out+=( (operation.output - operation.input) / it.coin_factor );if((operation.blockheight != -1 && !operation.main_chain)){out+='</strike>';}out+='</span>';}out+='</td>\r\n        <td class="text-right">'+( operation.balance / it.coin_factor )+'</td>\r\n    </tr>\r\n';} } out+='\r\n  </tbody>\r\n</table>\r\n</div>\r\n<p/>\r\n\r\n<div style=\'white-space:pre;\'>\r\n \r\n</div>\r\n';return out;
+};
+  
+  // Check for hash change (cross-browser solution)
+  if ("onhashchange" in window) { // event supported?
+      window.onhashchange = function () {
+          hashChanged(window.location.hash);
+      }
+  }
+  else { // event not supported:
+      var storedHash = window.location.hash;
+      window.setInterval(function () {
+              storedHash = window.location.hash;
+          if (window.location.hash != storedHash) {
+              hashChanged(storedHash);
+          }
+      }, 100);
+  }
+  
+  // Parse URL, perform API requests and route results to appropriate page (using callback). Shared by both backend and frontend.
+function route_prepare_data(data, script_name_prefix, url_parts)
+{
+    var currency = url_parts[0] || 'btc';
+
+    data['coin_factor'] = '100000000';
+    data['currency_api'] = currency;
+   
+    // Parse currency (first part of URL -- default to BTC)
+    switch (currency)
+    {
+    case 'ltc':
+      data['currency'] = 'Litecoin';
+      data['currency_short'] = 'LTC';
+      data['script_name'] = script_name_prefix + 'ltc';
+      data['default_fees'] = 0.001;
+      data['address_version'] = 48;
+      data['donation_address'] = "LXzHvrRMQVEHj6gvK4rsZ7HGopgqfxS7PS";
+      break;
+    case 'doge':
+      data['currency'] = 'Dogecoin';
+      data['currency_short'] = 'DOGE';
+      data['script_name'] = script_name_prefix + 'doge';
+      data['default_fees'] = 1.0;
+      data['address_version'] = 30;
+      data['donation_address'] = "DLm1XX5JcxQeGL5nXmkFCMJXCorcFQXRnT";
+      break;
+    case 'ppc':
+      data['currency'] = 'Peercoin';
+      data['currency_short'] = 'PPC';
+      data['coin_factor'] = '1000000';
+      data['script_name'] = script_name_prefix + 'ppc';
+      data['default_fees'] = 0.01;
+      data['address_version'] = 55;
+      data['donation_address'] = "PEiZ7r4KR85izAhfzQKJgJxdQkQ6PPXXEX";
+      break;
+    default:
+      data['currency'] = 'Bitcoin';
+      data['currency_short'] = 'BTC';
+      data['script_name'] = script_name_prefix + 'btc';
+      data['default_fees'] = 0.0001;
+      data['address_version'] = 0;
+      data['donation_address'] = "1LLqMFskaSaZ3w2LuH6dbQaULcy1Bu1b2R";
+      break;
+    }
+}
+
+function route_url(data, url_parts, display_callback)
+{
+    var request_type = url_parts[1] || 'index';
+
+    if (request_type == 'index') {
+      var payload1 = {'currency': data['currency_api'], 'method': 'getlatesttransactions', 'params': {}};
+      var payload2 = {'currency': data['currency_api'], 'method': 'getblocks', 'params': { 'page': 0 }};
+      
+      // Query for latest blocks and tx asynchronously
+      async.map([payload1, payload2], query_api, function(e, r) {
+        // Request template engine to display index
+        data['latest_transactions'] = r[0]['result'];
+        data['blocks'] = r[1]['result'];
+        data['title_details'] = 'Block Explorer';
+        display_callback(request_type, data);
+      });
+    } else if (request_type == 'block') {
+      var block_hash = url_parts[2];
+      var payload1 = {'currency': data['currency_api'], 'method': 'getblock', 'params': { 'hash': block_hash }};
+      
+      // Query for block asynchronously
+      async.map([payload1], query_api, function(e, r) {
+        // Request template engine to display our block
+        data['block'] = r[0]['result'];
+        data['title_details'] = 'Block #' + data['block']['height'];
+        display_callback(request_type, data);
+      });
+    } else if (request_type == 'tx') {
+      var tx_hash = url_parts[2];
+      var payload1 = {'currency': data['currency_api'], 'method': 'getrawtx', 'params': { 'hash': tx_hash }};
+      
+      // Query for transaction asynchronously
+      async.map([payload1], query_api, function(e, r) {
+        // Request template engine to display our block
+        data['transaction'] = r[0]['result'];
+        data['title_details'] = 'Transaction ' + data['transaction']['hash'];
+        display_callback(request_type, data);
+      });
+    } else if (request_type == 'address') {
+      var address = url_parts[2];
+      var payload1 = {'currency': data['currency_api'], 'method': 'getaddress', 'params': { 'address': address }};
+
+      // Query for address asynchronously
+      async.map([payload1], query_api, function(e, r) {
+        // Request template engine to display our block
+        data['address'] = r[0]['result'];
+        data['title_details'] = 'Address ' + data['address']['addr'];
+        display_callback(request_type, data);
+      });
+    }
+}
+
+// TODO: Work in progress
+function route_search(search_value) {
+  // Try to parse block height
+  var height = Number(search_value);
+  if (!isNaN(height)) {
+    var payload1 = {'currency': 'ltc', 'method': 'getblockhash', 'params': { 'height': height }};
+    async.map([payload1], query_api, function(e, r) {
+      // TODO
+    });
+    return true;
+  }
+  
+  // Try to get block and tx
+  if (search_value.match(/^[0-9A-Fa-f]+$/) && search_value.length == 64) {
+    var payload1 = {'currency': 'ltc', 'method': 'getblock', 'params': { 'hash': search_value }};
+    var payload2 = {'currency': 'ltc', 'method': 'getrawtx', 'params': { 'hash': search_value }};
+    
+    // Query for both at the same time
+    async.map([payload1, payload2], query_api, function(e, r) {
+      // TODO
+    });
+
+    return true;
+  }
+  
+  // Try to parse address
+  if (search_value.match(/^[a-zA-Z0-9]{27,34}/)) {
+    try
+    {
+      var bytes = Bitcoin.Base58.decode(string);
+      
+      // Try to be "intelligent" and redirect address by their prefix
+      switch (search_value[0]) {
+      case '1':
+        break;
+      case 'P':
+        break;
+      case 'L':
+        break;
+      case 'D':
+        break;
+      default:
+        throw 'Invalid address type';
+      }
+      
+      // No exception? seems like a valid address
+      var payload1 = {'currency': 'ltc', 'method': 'getaddress', 'params': { 'address': search_value }};
+      return true;
+    }
+    catch(err)
+    {}
+  }
+  
+  return false;
+}
+  
+  // Initial change
+  hashChanged(window.location.hash);
+
+  function main_search() {
+    route_search($('#search').val());
+  }
+  
+  function hashChanged(url) {
+    var url = window.location.hash;
+    var url_parts = url.split('/');
+    
+    url_parts.shift();
+    
+    var data = {
+      script_name_base: '#'
+    };
+    
+    route_prepare_data(data, '#/', url_parts);
+    // Update navbar and title
+    document.getElementById('navbar_content').innerHTML = navbarTemplate(data);
+    document.title = data['currency'] + ' ' + data['title_details'];
+
+    // Update currency
+    current_currency = data['currency_api'];
+    
+    route_url(data, url_parts, function(request_type, data) {
+      if (request_type == 'index') {
+        $('#content').html(indexTemplate(data));
+        setupLiveIndex(data);
+      } else if (request_type == 'block') {
+        $('#content').html(blockTemplate(data));
+      } else if (request_type == 'tx') {
+        $('#content').html(transactionTemplate(data));
+      } else if (request_type == 'address') {
+        $('#content').html(addressTemplate(data));
+        var keyValuePair = {};
+        keyValuePair["qrcode_public"] = data.address.addr;
+        ninja.qrCode.showQrCode(keyValuePair, 5);
+      }
+      // Scroll to top
+      document.body.scrollTop = document.documentElement.scrollTop = 0;
+      
+      // Update timeago
+      $("abbr.timeago").timeago();
+    });
+  }
+  
+</script>
+	</div>
+</div>
+
+<p>
+  <center>
+  Please help support development and server cost:<br style='clear:both;'/><br style='clear:both;'/>
+  BTC: <a href="#/btc/address/1LLqMFskaSaZ3w2LuH6dbQaULcy1Bu1b2R">1LLqMFskaSaZ3w2LuH6dbQaULcy1Bu1b2R</a><br style='clear:both;'/>
+  PPC: <a href="#/ppc/address/PEiZ7r4KR85izAhfzQKJgJxdQkQ6PPXXEX">PEiZ7r4KR85izAhfzQKJgJxdQkQ6PPXXEX</a><br style='clear:both;'/>
+  LTC: <a href="#/ltc/address/LXzHvrRMQVEHj6gvK4rsZ7HGopgqfxS7PS">LXzHvrRMQVEHj6gvK4rsZ7HGopgqfxS7PS</a><br style='clear:both;'/>
+  DOGE: <a href="#/doge/address/DLm1XX5JcxQeGL5nXmkFCMJXCorcFQXRnT">DLm1XX5JcxQeGL5nXmkFCMJXCorcFQXRnT</a>
+  </center>
+  <br/>
+  <center><a href="#/static/api.txt">API</a> - <a href="mailto:admin@bkchain.org">Contact</a> - <a href="https://github.com/bkchain/bkchain.org">Source code + Static version</a></center>
+</p>
+
+
+
+</body>
+</html>
+

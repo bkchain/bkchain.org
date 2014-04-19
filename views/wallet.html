@@ -1,0 +1,163 @@
+{{#def.loadfile('/views/header.html')}}    
+<div class="container">
+  <div id="welcome-div">
+    <form class="form-inline">
+      <div id="form-pass">
+        <div class="form-group">
+          <input id="electrum-seed" type="password" class="form-control" placeholder="Your electrum-like 12 words seed or master public key"/>
+        </div>
+        <div class="form-group">
+          <button id="open-wallet" class="btn btn-primary" disabled="true">Open Wallet</button>
+          <button id="generate-seed" class="btn">Generate Seed</button>
+        </div>
+        <div id="open-wallet-progress" class="progress progress-striped active">
+          <div id="open-wallet-progress-bar" class="progress-bar"  role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+            <span class="sr-only">0% Complete</span>
+          </div>
+        </div>
+        <div id="electrum-seed-generator" class="form-group">
+          <input id="electrum-generated-seed" type="text" class="form-control"/>
+          <strong>Note: Never lose your seed, it can't be recovered!</strong>
+        </div>
+      </div>
+    </form>
+    <div class="col-sm-4">
+      <h3>Secure & Private</h3>
+      <p><span class="glyphicon glyphicon-ok"></span> 100% client-side wallet.</p>
+      <p><span class="glyphicon glyphicon-ok"></span> Private keys never leave your browser.</p>
+      <p><span class="glyphicon glyphicon-ok"></span> No data is stored on server.</p>
+      <p><span class="glyphicon glyphicon-ok"></span> Login safely with your Master Public Key to only check account balance.</p>
+    </div>
+    <div class="col-sm-4">
+      <h3>Portable</h3>
+      <p><span class="glyphicon glyphicon-ok"></span> Login from anywhere, using only your 12-words seed (electrum-compatible).</p>
+      <p><span class="glyphicon glyphicon-ok"></span> Backup unecessary, remember your seed!</p>
+      <p><span class="glyphicon glyphicon-ok"></span> Address generated using <a href="https://electrum.org/">Electrum</a> deterministic wallet algorithm.</p>
+      <p><span class="glyphicon glyphicon-ok"></span> You are in control: even if site is down or disappear, you won't lose access to your wallet.</p>
+    </div>
+    <div class="col-sm-4">
+      <h3>Versatile</h3>
+      <p><span class="glyphicon glyphicon-ok"></span> Auto-generate receiving and change addresses as needed.</p>
+      <p><span class="glyphicon glyphicon-ok"></span> Support many currencies.</p>
+      <p><span class="glyphicon glyphicon-ok"></span> Accessible from any web browser.</p>
+    </div>
+  </div>
+  
+  <div id="wallet-div" class="row">
+    <div id="wallet-menu-div" class="col-sm-2">
+      <ul class="nav nav-pills nav-stacked">
+        <li class="nav-header">Wallet menu</li>
+        <li class="active"><a href="#" id="addresses-nav"><i class="fa fa-align-justify"></i>Addresses</a></li>
+        <li><a href="#" id="payment-nav">Send Payment</a></li>
+        <li><a href="#" id="publickey-nav">Public Key</a></li>
+      </ul>
+    </div>
+
+    <div id="wallet-main-div" class="col-sm-10">
+      <div id="wallet-alert-div">
+      </div>
+      <div id="payment-div">
+        <div class="row">
+          <div class="col-sm-8">
+            <div class="form-group">
+              <div class="form-group input-group">
+                <span class="input-group-addon">Pay to (Address)</span>
+                <input id="txDest1" type="text" class="form-control" placeholder="1SomeAddress..." />
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-4">
+            <div class="form-group input-group">
+              <span id="amount-prepend-text" class="input-group-addon">Amount (BTC)</span>
+              <input id="txValue1" type="text" class="form-control" placeholder="amount" />
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-sm-5">
+            <div class="form-group input-group">
+              <span id="fees-prepend-text" class="input-group-addon">Fees (BTC)</span>
+              <input id="txFees" type="text" class="form-control" placeholder="tx fees" value="0.0001"/>
+            </div>
+          </div>
+          <div class="col-sm-5" id="donate-div">
+            <div class="form-group input-group">
+              <span id="donate-prepend-text" class="input-group-addon">Donate (BTC)</span>
+              <input id="txDonate" type="text" class="form-control" placeholder="donate" value="0"/>
+            </div>
+          </div>
+          <div class="col-sm-2">
+            <button class="btn btn-primary" id="txSend">Verify</button>
+          </div>
+        </div>
+      </div>
+      
+      <div id="addresses-div" class="col-sm-10">
+        <button class="btn" id="address-refresh" disabled="true">Refresh</button>
+        <i id="address-refresh-icon" class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></i>
+        <table class="table table-condensed tree" id="address-tree">
+          <thead>
+            <tr>
+              <th class="text-center">Your Addresses</th>
+              <th class="text-center">QR</th>
+              <th class="text-center">Balance</th>
+              <th class="text-center">Tx</th>
+            </tr>
+          </thead>
+          <tbody id="address-tree-body">
+              <tr data-tt-id="1">
+                <td class="text-left">Main account</td><td></td><td id="total-balance" class="text-center"></td><td></td>
+              </tr>
+              <tr data-tt-id="2" data-tt-parent-id="1">
+                <td class="text-left">Receiving</td><td></td><td></td><td></td>
+              </tr>
+              <tr data-tt-id="3" data-tt-parent-id="1">
+                <td class="text-left">Change</td><td></td><td></td><td></td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <div id="publickey-div" class="col-sm-10">
+        <p>Your <strong>Master Public Key</strong> is: <span id="electrum-publickey"></span></p>
+        <p>You can use it to open your wallet in <strong>watch-only mode</strong>. To do that, just use this master public key instead of your 12-words seed to open your wallet.<p>
+        <p>No private keys can be generated from it, so it is safe to use on unsecured computers to check your account balance.</p>
+        <p>In a future version, it will also be used to create cold storage transaction.</p>
+      </div>
+    </div>
+  </div>
+  
+  <div id="verifyModal" class="modal fade">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+          <h4 class="modal-title">Verify transaction</h4>
+        </div>
+        <div class="modal-body row">
+          <div class="control-group">
+            <label class="control-label" for="txJSON">JSON Transaction</label> 
+            <div class="controls"> 
+              <textarea class="col-xs-12" id="txJSON" rows="8"></textarea>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="txHex">Raw Transaction</label> 
+            <div class="controls"> 
+              <textarea class="col-xs-12" id="txHex" rows="4"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal" id="sendPayment">Send payment</button>
+        </div>
+      </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+  </div><!-- /.modal -->
+  <script type="text/javascript">
+    var current_currency = '{{=it.currency_api}}';
+    var script_name = '{{=it.script_name}}';
+  </script>
+</div>
+{{#def.loadfile('/views/footer.html')}}

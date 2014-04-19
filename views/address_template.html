@@ -1,0 +1,73 @@
+<div class="row">
+<div class="col-md-5">
+<table class="table table-condensed table-striped">
+  <thead>
+    <th colspan='2'>Address</th>
+  </thead>
+  <tbody>
+  <tr>
+    <td>Balance:</td>
+    <td>{{= (it.address.total_output - it.address.total_input) / it.coin_factor }} {{=it.currency_short}}</td>
+  </tr>
+  <tr>
+    <td>Sent:</td>
+    <td>{{= it.address.total_input / it.coin_factor }} {{=it.currency_short}}</td>
+  </tr>
+  <tr>
+    <td>Received:</td>
+    <td>{{= it.address.total_output / it.coin_factor }} {{=it.currency_short}}</td>
+  </tr>
+  <tr>
+    <td>Transactions:</td>
+    <td>{{=it.address.txcount }}</td>
+  </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="col-md-5">
+  <span class='addr-caption'> {{= it.address.addr }} </span>
+  <hr/>
+  <div id="qrcode_public" class="qrcode_public"><canvas/></div>
+</div>
+
+<div>
+<table class="table table-condensed table-striped">
+  <thead>
+    <th class="text-center">Transaction</th>
+    <th class="text-center">Block</th>
+    <th class="text-center">Age</th>
+    <th class="text-center">Conf</th>
+    <th class="text-center">Amount</th>
+    <th class="text-center">Balance</th>
+  </thead>
+  <tbody>
+{{~it.address.ops :operation:index}}
+    <tr>
+        <td><a href='{{=it.script_name}}/tx/{{= operation.txhash }}'>{{= operation.txhash.substring(0, 8) + '...' }}</a></td>
+{{? (operation.blockheight != -1) }}
+        <td><a href='{{=it.script_name}}/block/{{= operation.blockhash }}'>{{= operation.blockheight }}</a></td>
+{{??}}
+        <td>Mempool</td>
+{{?}}
+        <td><abbr class="timeago" rel="tooltip" data-animation="false" title="{{= operation.time }}Z">{{= operation.time }} UTC</abbr></td>
+        <td>
+            {{? (operation.blockheight == -1) }}<span class='neg'>0</span>
+            {{?? (!operation.main_chain) }}<span class='neg'>Orph.</span>
+            {{?? (operation.confirmed) }}<span class='pos'>{{= operation.confirmations }}</span>
+            {{??}} {{= operation.confirmations }}
+            {{?}}
+        </td>
+        <td class="text-right">{{? ((operation.output - operation.input) < 0) }}<span class='neg'>{{? (operation.blockheight != -1 && !operation.main_chain) }}<strike>{{?}}{{= (operation.output - operation.input) / it.coin_factor }}{{? (operation.blockheight != -1 && !operation.main_chain) }}</strike>{{?}}</span>
+        {{??}}<span class='pos'>{{? (operation.blockheight != -1 && !operation.main_chain) }}<strike>{{?}}{{= (operation.output - operation.input) / it.coin_factor }}{{? (operation.blockheight != -1 && !operation.main_chain) }}</strike>{{?}}</span>{{?}}</td>
+        <td class="text-right">{{= operation.balance / it.coin_factor }}</td>
+    </tr>
+{{~}}
+  </tbody>
+</table>
+</div>
+<p/>
+
+<div style='white-space:pre;'>
+ 
+</div>

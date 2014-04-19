@@ -1,0 +1,118 @@
+<div class="row">
+<div class="col-md-5">
+<table class="table table-condensed table-striped">
+  <thead>
+    <th colspan='2'>Block #{{= it.block.height }}</th>
+  </thead>
+  <tbody>
+  <tr>
+    <td>Type:</td>
+    <td>{{? it.block.type == "pos" }}Proof of Stake{{??}}Proof of Work{{?}}</td>
+  </tr>
+  <tr>
+    <td>Confirmations:</td>
+    <td>{{? it.block.main_chain }}{{= it.block.confirmations }}{{??}}<span class='neg'>Orphaned</span>{{?}}</td>
+  </tr>
+  <tr>
+    <td>Size:</td>
+    <td>{{= it.block.size }} bytes</td>
+  </tr>
+  <tr>
+    <td>Height:</td>
+    <td>{{= it.block.height }} {{? it.block.main_chain }}<span class='pos'>(Longest chain)</span>{{??}}<span class='neg'>(Orphaned)</span>{{?}}</td>
+  </tr>
+  <tr>
+    <td>Version:</td>
+    <td>{{= it.block.ver }}</td>
+  </tr>
+  <tr>
+    <td>Time:</td>
+    <td>{{= it.block.time }}</td>
+  </tr>
+  <tr>
+    <td>Nonce:</td>
+    <td>{{= it.block.nonce.toString(16) }}</td>
+  </tr>
+  <tr>
+    <td>Bits:</td>
+    <td>{{= it.block.bits.toString(16) }}</td>
+  </tr>
+  <tr>
+    <td>Difficulty:</td>
+    <td>{{= it.block.diff.toFixed(8) }}</td>
+  </tr>
+  <tr>
+    <td>Transactions:</td>
+    <td>{{= it.block.txcount }}</td>
+  </tr>
+  <tr>
+    <td>Input:</td>
+    <td>{{= it.block.in / it.coin_factor }} {{=it.currency_short}}</td>
+  </tr>
+  <tr>
+    <td>Output:</td>
+    <td>{{= it.block.out / it.coin_factor }} {{=it.currency_short}}</td>
+  </tr>
+  <tr>
+    <td>Reward:</td>
+    <td>{{= it.block.reward / it.coin_factor }} {{=it.currency_short}}</td>
+  </tr>
+  <tr>
+    <td>Fees:</td>
+    <td>{{= (it.block.in - it.block.out) / it.coin_factor }} {{=it.currency_short}}</td>
+  </tr>
+  <tr>
+    <td>Coin age destroyed:</td>
+    <td>{{= (it.block.coinage_destroyed / it.coin_factor).toFixed(6) }} {{=it.currency_short}} days</td>
+  </tr>
+  <tr>
+    <td>Average coin age:</td>
+    <td>{{= it.block.avg_coinage.toFixed(6) }} days</td>
+  </tr>
+  </tbody>
+</table>
+</div>
+<div class="col-md-7">
+<table class="table table-condensed table-striped">
+  <thead>
+    <th colspan='2'>Hashes</th>
+  </thead>
+  <tbody>
+  <tr>
+    <td>Hash:</td>
+    <td><div class="hash">{{= it.block.hash }}</div></td>
+  </tr>
+  <tr>
+    <td>Previous:</td>
+    <td><a class="hash" href='{{=it.script_name}}/block/{{= it.block.prev }}'>{{= it.block.prev }}</a></td>
+  </tr>
+  <tr>
+    <td>Next(s):</td>
+    <td>
+{{~it.block.nexts :value:index}}
+      <a class="hash" href='{{=it.script_name}}/block/{{=value}}'>{{=value}}</a>
+{{~}}
+    </td>
+  </tr>
+  <tr>
+    <td>Merkle:</td>
+    <td><div class="hash">{{= it.block.merkle }}</div></td>
+  </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+
+<p style='clear:both;'/>
+<div class='tx-list'>
+{{~it.block.transactions :value:index}}
+  {{ it.transaction = value; }}
+  {{#def.loadfile('/views/tx_core.html')}}
+{{~}}
+</div>
+<p/>
+
+<div style='white-space:pre;'>
+ 
+</div>

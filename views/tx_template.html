@@ -1,0 +1,81 @@
+<div class="row">
+<div class="col-md-5">
+<table class="table table-condensed table-striped">
+  <thead>
+    <th colspan='2'>Transaction</th>
+  </thead>
+  <tbody>
+  <tr>
+    <td>Confirmations:</td>
+    <td>
+        {{? it.transaction.blocks.length == 0 }}<span class='neg'>Unconfirmed</span>
+        {{?? !it.transaction.main_chain }}<span class='neg'>Orphaned</span>
+        {{?? it.transaction.confirmed }}<span class='pos'>{{= it.transaction.confirmations }}</span>
+        {{??}}{{= it.transaction.confirmations }}
+        {{?}}
+    </td>
+  </tr>
+  <tr>
+    <td>Size:</td>
+    <td>{{= it.transaction.size }} bytes</td>
+  </tr>
+  <tr>
+    <td>Version:</td>
+    <td>{{= it.transaction.ver }}</td>
+  </tr>
+  <tr>
+    <td>Time:</td>
+    <td>{{= it.transaction.time }}</td>
+  </tr>
+  <tr>
+    <td>Input:</td>
+    <td>{{= it.transaction.in / it.coin_factor }} {{=it.currency_short}}</td>
+  </tr>
+  <tr>
+    <td>Output:</td>
+    <td>{{= it.transaction.out / it.coin_factor }} {{=it.currency_short}}</td>
+  </tr>
+  <tr>
+    <td>Fees:</td>
+    <td>{{? (it.transaction.in - it.transaction.out > 0) }} {{= (it.transaction.in - it.transaction.out) / it.coin_factor }} {{??}} 0 {{?}} {{=it.currency_short}}</td>
+  </tr>
+  <tr>
+    <td>Coin age destroyed:</td>
+    <td>{{= it.transaction.coinage_destroyed / it.coin_factor }} {{=it.currency_short}} days</td>
+  </tr>
+  </tbody>
+</table>
+</div>
+<div class="col-md-7">
+<table class="table table-condensed table-striped">
+  <thead>
+    <th colspan='2'>Hashes</th>
+  </thead>
+  <tbody>
+  <tr>
+    <td>Hash:</td>
+    <td><div class="hash">{{= it.transaction.hash }}</div></td>
+  </tr>
+  <tr>
+    <td>Block(s):</td>
+    <td>
+{{~it.transaction.blocks :block:index}}
+      <a class="hash" href='{{=it.script_name}}/block/{{= block }}'>{{= block }}</a>
+{{~}}
+    </td>
+  </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+<p style='clear:both;'/>
+<div class='tx-list'>
+{{#def.loadfile('/views/tx_core.html')}}
+</div>
+<p/>
+
+<div style='white-space:pre;'>
+ 
+</div>
+

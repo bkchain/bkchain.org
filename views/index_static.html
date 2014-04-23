@@ -42,7 +42,7 @@
   hashChanged(window.location.hash);
 
   function main_search() {
-    route_search($('#search').val());
+    route_search(current_currency, $('#search').val(), function(location) { window.location.hash = '/' + location; });
   }
   
   function hashChanged(url) {
@@ -82,7 +82,8 @@
       
       // Update timeago
       $("abbr.timeago").timeago();
-    });
+    }, function(location) { window.location.hash = '/' + location; }
+    );
   }
   
 </script>

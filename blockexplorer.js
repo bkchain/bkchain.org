@@ -36,9 +36,9 @@ app.engine('.html', engines.dot);
 
 app.use('/static', express.static(__dirname + '/static'));
 
-var query_api = function(request,cb){
-     var payload = {'method': request['method'], 'id': 1, 'jsonrpc': 1, 'params': request['params']};
-     request.post({ url: 'http://bkchain.org/api/raw/' + request['currency'], body: JSON.stringify(payload) }, function(err,response,body){
+var query_api = function(req,cb){
+     var payload = {'method': req['method'], 'id': 1, 'jsonrpc': 1, 'params': req['params']};
+     request.post({ url: 'http://bkchain.org/api/raw/' + req['currency'], body: JSON.stringify(payload) }, function(err,response,body){
            if (err){
                  cb(err);
            } else {
@@ -53,8 +53,14 @@ app.get(/^(.*)$/, function(req, res) {
     var url = req.params[0];
     var url_parts = url.split('/').filter(function(e){return e});
     
+    // Transform /btc/search?search=XXX into /btc/search/XXX
+    if (url_parts.length == 2 && url_parts[1] == 'search' && req.param('search') !== undefined)
+      url_parts.push(req.param('search'));
+    
     // Defer routing to shared client/server url parser system
-    route_url(data, '/', url_parts, function(request_type, data) { res.render(request_type + '.html', data); });
+    if (!route_prepare_data(data, '/', url_parts))
+      return;
+    route_url(data, url_parts, function(request_type, data) { res.render(request_type + '.html', data); }, function(url) { res.redirect('/' + url); });
 });
 
 // Start server

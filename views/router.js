@@ -34,7 +34,7 @@ function route_prepare_data(data, script_name_prefix, url_parts)
       data['address_version'] = 55;
       data['donation_address'] = "PEiZ7r4KR85izAhfzQKJgJxdQkQ6PPXXEX";
       break;
-    default:
+    case 'btc':
       data['currency'] = 'Bitcoin';
       data['currency_short'] = 'BTC';
       data['script_name'] = script_name_prefix + 'btc';
@@ -42,10 +42,13 @@ function route_prepare_data(data, script_name_prefix, url_parts)
       data['address_version'] = 0;
       data['donation_address'] = "1LLqMFskaSaZ3w2LuH6dbQaULcy1Bu1b2R";
       break;
+    default:
+      return false;
     }
+  return true;
 }
 
-function route_url(data, url_parts, display_callback)
+function route_url(data, url_parts, display_callback, redirect_callback)
 {
     var request_type = url_parts[1] || 'index';
 
@@ -95,28 +98,39 @@ function route_url(data, url_parts, display_callback)
         display_callback(request_type, data);
       });
     }
+    else if (request_type == 'search') {
+      route_search(data['currency_api'], url_parts[2], redirect_callback);
+    }
 }
 
 // TODO: Work in progress
-function route_search(search_value) {
+function route_search(currency, search_value, redirect_callback) {
   // Try to parse block height
   var height = Number(search_value);
   if (!isNaN(height)) {
-    var payload1 = {'currency': 'ltc', 'method': 'getblockhash', 'params': { 'height': height }};
+    var payload1 = {'currency': currency, 'method': 'getblockhash', 'params': { 'height': height }};
     async.map([payload1], query_api, function(e, r) {
-      // TODO
+      redirect_callback(currency + '/block/' + r[0]['result']['hash']);
     });
     return true;
   }
   
   // Try to get block and tx
   if (search_value.match(/^[0-9A-Fa-f]+$/) && search_value.length == 64) {
-    var payload1 = {'currency': 'ltc', 'method': 'getblock', 'params': { 'hash': search_value }};
-    var payload2 = {'currency': 'ltc', 'method': 'getrawtx', 'params': { 'hash': search_value }};
+    // TODO: Special RPC for hash search
+    var payload1 = {'currency': currency, 'method': 'getblock', 'params': { 'hash': search_value }};
+    var payload2 = {'currency': currency, 'method': 'getrawtx', 'params': { 'hash': search_value }};
     
     // Query for both at the same time
     async.map([payload1, payload2], query_api, function(e, r) {
       // TODO
+      var block = r[0]['result'];
+      var tx = r[1]['result'];
+      if (block['hash'] !== undefined) {
+        redirect_callback(currency + '/block/' + block['hash']);
+      } else if (tx['hash'] !== undefined) {
+        redirect_callback(currency + '/tx/' + tx['hash']);
+      }
     });
 
     return true;
@@ -126,24 +140,27 @@ function route_search(search_value) {
   if (search_value.match(/^[a-zA-Z0-9]{27,34}/)) {
     try
     {
-      var bytes = Bitcoin.Base58.decode(string);
+      // Try to decode address in base58
+      //var bytes = Bitcoin.Base58.decode(search_value);
       
       // Try to be "intelligent" and redirect address by their prefix
       switch (search_value[0]) {
       case '1':
+        redirect_callback('btc/address/' + search_value);
         break;
       case 'P':
+        redirect_callback('ppc/address/' + search_value);
         break;
       case 'L':
+        redirect_callback('ltc/address/' + search_value);
         break;
       case 'D':
+        redirect_callback('doge/address/' + search_value);
         break;
       default:
         throw 'Invalid address type';
       }
       
-      // No exception? seems like a valid address
-      var payload1 = {'currency': 'ltc', 'method': 'getaddress', 'params': { 'address': search_value }};
       return true;
     }
     catch(err)

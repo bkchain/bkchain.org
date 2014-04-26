@@ -1,7 +1,7 @@
       <tr>
 		<td class="text-center"><a href='{{=it.script_name}}/block/{{= it.block.hash }}'>{{= it.block.height }}</a></td>
 {{ if (it.proofofstake !== undefined) { }}
-        <td class="text-center">{{= it.block.type }}</td>
+        <td class="text-center">{{= it.block.type.toUpperCase() }}</td>
 {{ } }}
 		<td class="text-center"><abbr class="timeago" rel="tooltip" data-animation="false" title="{{= it.block.time }}Z">{{= it.block.time }} UTC</abbr></td>
 		<td class="text-center">{{= it.block.size }}</td>

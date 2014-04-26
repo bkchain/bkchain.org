@@ -33,6 +33,7 @@ function route_prepare_data(data, script_name_prefix, url_parts)
       data['default_fees'] = 0.01;
       data['address_version'] = 55;
       data['donation_address'] = "PEiZ7r4KR85izAhfzQKJgJxdQkQ6PPXXEX";
+      data['proofofstake'] = true;
       break;
     case 'btc':
       data['currency'] = 'Bitcoin';

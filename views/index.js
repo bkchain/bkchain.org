@@ -3,11 +3,20 @@
 
     var livetx;
     var liveblock;
+    var websocket;
+    
     function setupLiveIndex(data)
     {
+        closeLiveIndex();
+    
         livetx = document.getElementById("livetx");
         liveblock = document.getElementById("liveblock");
-        websocket = new WebSocket("ws://127.0.0.1:9352/livetx");
+{{ if ({{#!def.static}}) { }}
+        var livetx_url = "ws://bkchain.org/{{=it.currency_api}}/livetx";
+{{ } else { }}
+        var livetx_url = "ws://bkchain.org/" + data['currency_api'] + "/livetx";
+{{ } }}
+        websocket = new WebSocket(livetx_url);
         websocket.onopen = function(evt) { websocket.send(JSON.stringify({ subscribe: 'livetx' })); };
         websocket.onerror = function(evt) { };
         websocket.onmessage = function(evt) { writeToScreen(data, JSON.parse(evt.data)); };
@@ -29,6 +38,12 @@
           else
             continue;
         }
+    }
+    function closeLiveIndex()
+    {
+      // Close previous connection (if any)
+      if (websocket !== undefined)
+        websocket.close();
     }
  function writeToScreen(data, message)
  {

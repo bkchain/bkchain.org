@@ -46,6 +46,9 @@
   }
   
   function hashChanged(url) {
+    // Close web socket (if any was still running)
+    closeLiveIndex();
+    
     var url = window.location.hash;
     var url_parts = url.split('/');
     

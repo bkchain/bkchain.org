@@ -79,6 +79,11 @@
         var keyValuePair = {};
         keyValuePair["qrcode_public"] = data.address.addr;
         ninja.qrCode.showQrCode(keyValuePair, 5);
+      } else if (request_type == 'error') {
+        $('#content').html('<div class="alert ' + alertType + ' alert-dismissable">'
+         + '<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>'
+         + data['message']
+         + '</div>');
       }
       // Scroll to top
       document.body.scrollTop = document.documentElement.scrollTop = 0;

@@ -52,6 +52,17 @@ function route_prepare_data(data, script_name_prefix, url_parts)
 function route_url(data, url_parts, display_callback, redirect_callback)
 {
     var request_type = url_parts[1] || 'index';
+   
+    if (request_type == 'search') {
+      var error_message = route_search(data['currency_api'], url_parts[2], redirect_callback);
+      if (error_message == null) {
+        // No error
+        return;
+      } else {
+        request_type = 'index';
+        data['error_message'] = error_message;
+      }
+    }
 
     if (request_type == 'index') {
       var payload1 = {'currency': data['currency_api'], 'method': 'getlatesttransactions', 'params': {}};
@@ -99,9 +110,6 @@ function route_url(data, url_parts, display_callback, redirect_callback)
         display_callback(request_type, data);
       });
     }
-    else if (request_type == 'search') {
-      route_search(data['currency_api'], url_parts[2], redirect_callback);
-    }
 }
 
 // TODO: Work in progress
@@ -113,7 +121,7 @@ function route_search(currency, search_value, redirect_callback) {
     async.map([payload1], query_api, function(e, r) {
       redirect_callback(currency + '/block/' + r[0]['result']['hash']);
     });
-    return true;
+    return null;
   }
   
   // Try to get block and tx
@@ -134,7 +142,7 @@ function route_search(currency, search_value, redirect_callback) {
       }
     });
 
-    return true;
+    return null;
   }
   
   // Try to parse address
@@ -162,11 +170,11 @@ function route_search(currency, search_value, redirect_callback) {
         throw 'Invalid address type';
       }
       
-      return true;
+      return null;
     }
     catch(err)
     {}
   }
   
-  return false;
+  return 'Could not find any matching result.';
 }

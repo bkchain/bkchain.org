@@ -36,9 +36,9 @@ var wallet = new function() {
   
   function prepareTx() {
     var addr = $('#txDest1').val();
-    var amount = parseFloat($('#txValue1').val()) * coinfactor;
-    var fees = parseFloat($('#txFees').val()) * coinfactor;
-    var donate = parseFloat($('#txDonate').val()) * coinfactor;
+    var amount = Math.round(parseFloat($('#txValue1').val()) * coinfactor);
+    var fees = Math.round(parseFloat($('#txFees').val()) * coinfactor);
+    var donate = Math.round(parseFloat($('#txDonate').val()) * coinfactor);
     
     var total = 0;
     var valid = false;

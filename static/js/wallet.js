@@ -65,7 +65,7 @@ var wallet = new function() {
     }
 
     // Query unspent outputs
-    query_url("api/v1/address/unspent/" + inputKeys.map(function(x) { return x.address }).join() + "?confirmations=0", function(unspent_results) {
+    query_url("https://bkchain.org/" + current_currency + "/api/v1/address/unspent/" + inputKeys.map(function(x) { return x.address }).join() + "?confirmations=0", function(unspent_results) {
       var inputs = [];
       var total = 0;
       var valid = false;
@@ -239,7 +239,7 @@ var wallet = new function() {
   
     var keys = get_keys();
     var total_balance = 0;
-    query_url("api/v1/address/balance/" + keys.map(function(x) { return x.address }).join() + "?confirmations=0", function(balance_results) {
+    query_url("https://bkchain.org/" + current_currency + "/api/v1/address/balance/" + keys.map(function(x) { return x.address }).join() + "?confirmations=0", function(balance_results) {
       for (var i = 0; i < balance_results.length; ++i) {
         var balance_result = balance_results[i];
 
@@ -247,7 +247,7 @@ var wallet = new function() {
         key.balance = balance_result.balance;
         key.txcount = balance_result.txcount;
         key.item.find('td.address-balance').first().text(balance_result.balance / coinfactor);
-        key.item.find('td.address-tx').first().html('<a href="address/' + key.address + '" target="_blank">' + balance_result.txcount + '</a>');
+        key.item.find('td.address-tx').first().html('<a href="' + script_name + '/address/' + key.address + '" target="_blank">' + balance_result.txcount + '</a>');
         
         if (!key.hasOwnProperty('striked') && key.balance == 0 && key.txcount > 0) {
           // Strike used addresses
@@ -265,13 +265,13 @@ var wallet = new function() {
   
   function sendTx() {
     var txHex = $('#txHex').val();
-    $.post("api/v1/tx/push",
+    $.post("https://bkchain.org/" + current_currency + "/api/v1/tx/push",
            JSON.stringify({ hexdata: txHex }),
            function(data) {
              if (data === "exception") {
                send_alert('alert-danger', '<strong>Error!</strong> Transaction failed!');
              } else {
-               send_alert('alert-success', '<strong>Good!</strong> Transaction sent, id: <a href="tx/' + data + '" target="_blank">' + data + '</a>');
+               send_alert('alert-success', '<strong>Good!</strong> Transaction sent, id: <a href="' + script_name + '/tx/' + data + '" target="_blank">' + data + '</a>');
              }
              
              // Wait a few seconds before refreshing balances

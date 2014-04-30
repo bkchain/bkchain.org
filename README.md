@@ -2,6 +2,9 @@
 
 Blockchain explorer and wallet.
 
+http://bkchain.org
+
+
 ## Features:
 * Browse blocks, transactions, etc...
 * JSON API
@@ -26,3 +29,11 @@ Requirements:
 * Node.js
 
 TODO
+
+## Donations
+
+Donation appreciated, to support development and server costs
+
+* BTC: 1LLqMFskaSaZ3w2LuH6dbQaULcy1Bu1b2R
+* PPC: PEiZ7r4KR85izAhfzQKJgJxdQkQ6PPXXEX
+* LTC: LXzHvrRMQVEHj6gvK4rsZ7HGopgqfxS7PS

@@ -1,0 +1,16 @@
+{
+  "name": "bkchain.org",
+  "description": "bkchain.org",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "express": "4.x",
+    "async": "^0.7.0",
+    "consolidate": "0.10.0",
+    "dot": "1.0.2",
+    "express-dot": "0.1.0",
+    "json": "0.0.14",
+    "request": "2.34.0",
+    "http-proxy": "https://github.com/bkchain/node-http-proxy/tarball/5f9716a9703e815a50b8700f6248385f11662194"
+  }
+}

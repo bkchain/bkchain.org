@@ -10,9 +10,8 @@ http://bkchain.org
 * JSON API
 * Live transactions/blocks
 * Client-side and server-side versions
+* Search
 * Wallet (electrum deterministic)
-
-Note: Search doesn't work yet.
 
 ## How to use
 
@@ -23,12 +22,18 @@ Note: Search doesn't work yet.
 
 ### Server-side version
 
-Note: currently non-functional, some features are missing.
+Note: might require some additional testing, but it should be functional.
 
 Requirements:
 * Node.js
+* npm
 
-TODO
+Steps:
+* Go to bkchain.org directory
+* Execute "npm install" to download Node.js dependencies
+* Execute "node blockexplorer.js" to start the server
+
+Default configuration will use https://bkchain.org as proxy backend for API, but you can configure it to use local bkchaind daemon.
 
 ## Donations
 

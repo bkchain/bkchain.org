@@ -12,7 +12,8 @@
         livetx = document.getElementById("livetx");
         liveblock = document.getElementById("liveblock");
 {{ if ({{#!def.static}}) { }}
-        var livetx_url = "ws://bkchain.org/{{=it.currency_api}}/livetx";
+        var l = window.location;
+        var livetx_url = "ws://" + l.hostname + (((l.port != 80) && (l.port != 443)) ? ":" + l.port : "") + "{{=it.script_name_base}}/{{=it.currency_api}}/livetx";
 {{ } else { }}
         var livetx_url = "ws://bkchain.org/" + data['currency_api'] + "/livetx";
 {{ } }}

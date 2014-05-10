@@ -1,12 +1,20 @@
 var async = require('async');
 var fs = require('fs');
 var request = require('request');
+var http = require('http');
+var httpProxy = require('http-proxy');
 var express = require('express'),
     app = express(),
     doT = require('dot'),
     pub = __dirname + '/public',
     view =  __dirname + '/views';
     
+var proxy = new httpProxy.createProxyServer({ ws: true, agent: http.globalAgent });
+
+var api_local_hosted = false;
+var api_remote_url_raw = 'https://bkchain.org/';
+var api_remote_url_ws = 'ws://bkchain.org/';
+
 var defs = {
     loadfile:function(path){return fs.readFileSync(__dirname + path, 'utf8');},
     savefile:function(path, data){return fs.writeFileSync(__dirname + path, data, 'utf8');},
@@ -36,9 +44,51 @@ app.engine('.html', engines.dot);
 
 app.use('/static', express.static(__dirname + '/static'));
 
+function get_ws_api_url(currency) {
+  if (api_local_hosted) {
+    // Hosted locally, redirect to appropriate port (bkchaind daemon)
+    switch (currency) {
+    case 'btc':
+      return 'http://127.0.0.1:8352';
+    case 'ltc':
+      return 'http://127.0.0.1:9352';
+    case 'ppc':
+      return 'http://127.0.0.1:9922';
+    case 'doge':
+      return 'http://127.0.0.1:22575';
+    default:
+      throw 'Invalid currency';
+    }
+  } else {
+    // Not hosted locally, redirect to online website
+    return api_remote_url_ws + currency + '/api/ws';
+  }
+}
+
+function get_raw_api_url(currency) {
+  if (api_local_hosted) {
+    // Hosted locally, redirect to appropriate port (bkchaind daemon)
+    switch (currency) {
+    case 'btc':
+      return 'http://127.0.0.1:8342';
+    case 'ltc':
+      return 'http://127.0.0.1:9342';
+    case 'ppc':
+      return 'http://127.0.0.1:9912';
+    case 'doge':
+      return 'http://127.0.0.1:22565';
+    default:
+      throw 'Invalid currency';
+    }
+  } else {
+    // Not hosted locally, redirect to online website
+    return api_remote_url_raw + currency + '/api/raw';
+  }
+}
+
 var query_api = function(req,cb){
      var payload = {'method': req['method'], 'id': 1, 'jsonrpc': 1, 'params': req['params']};
-     request.post({ url: 'http://bkchain.org/api/raw/' + req['currency'], body: JSON.stringify(payload) }, function(err,response,body){
+     request.post({ url: get_raw_api_url(req['currency']), body: JSON.stringify(payload) }, function(err,response,body){
            if (err){
                  cb(err);
            } else {
@@ -108,6 +158,9 @@ function route_api(data, url_parts, req, json_callback) {
         }
         break;
       }
+    } else if (api_version == 'raw') {
+      // "raw" api, proxy to actual bkchaind server
+      proxy.web(req, res, { target: get_raw_api_url(data['currency_api']) });
     }
 }
 
@@ -136,7 +189,18 @@ app.get(/^(.*)$/, function(req, res) {
     }
 });
 
+var server = require('http').createServer(app);
+
+// Proxy websockets
+server.on('upgrade', function (req, socket, head) {
+  var url_parts = req.url.split('/').filter(function(e){return e});
+  proxy.on('error', function(e) { console.log('pipe socket error: %s', e); });
+  proxy.ws(req, socket, { target: get_ws_api_url(url_parts[0]) });
+});
+
+server.on('error', function (e) { console.log('server error: %s', e); });
+
 // Start server
-var server = app.listen(3000, function() {
+server.listen(3000, function() {
     console.log('Listening on port %d', server.address().port);
 });

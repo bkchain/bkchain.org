@@ -475,6 +475,7 @@ $(document).ready(function() {
       pubKey.unshift(4);
       $('#electrum-publickey').text(Crypto.util.bytesToHex(pubKey.slice(1)));
       Electrum.initPublic(pubKey);
+      $('#backup-nav').hide();
       $('#payment-nav').hide();
       $('#welcome-div').hide();
       $('#wallet-div').show();

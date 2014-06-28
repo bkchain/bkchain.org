@@ -69,7 +69,8 @@ var wallet = new function() {
     
     // Query unspent outputs (grouped by 10)
     var addressesGroupSize = 10;
-    var addressesGroupCount = (addressesToCheck.length + addressesGroupSize - 1) / addressesGroupSize;
+    var addressesGroupCount = ((addressesToCheck.length + addressesGroupSize - 1) / addressesGroupSize) | 0;
+    var addressesGroupCountLeft = addressesGroupCount;
     var enoughFundsFound = false;
     var inputs = [];
     var total = 0;
@@ -103,7 +104,7 @@ var wallet = new function() {
         // We could find enough funds from address but when checking unspent outputs it didn't match?
         // Either something changed on us in the meantime (could happen) or it's a bug.
         if (!valid) {
-          if (--addressesGroupCount == 0) {
+          if (--addressesGroupCountLeft == 0) {
             $('#txJSON').val("error: Not enough funds (could not find unspent outputs)");
           }
           return;

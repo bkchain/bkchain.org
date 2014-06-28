@@ -198,6 +198,16 @@ var wallet = new function() {
       key.item = newItem;
       key.nodeIndex = nodeIndex;
       
+      var modeName = mode == 0 ? "change" : "receiving";
+      var itemName = modeName + '-' + keys.length;
+      var newBackupItem = $('<div class="backup-entry"><div class="backup-public"><div id="backup-public-qrcode-' + itemName + '" class="backup-public-qrcode"><canvas/></div><div class="backup-public-address"><span><b>Public Address:</b></span><span style="display: block;">' + key.address + '</span></div></div><div class="backup-private"><div id="backup-private-qrcode-' + itemName + '" class="backup-private-qrcode"><canvas/></div><div class="backup-private-address"><span><b>Private Key:</b></span><span style="display: block;">' + key.eckey.getExportedPrivateKey() + '<span></div></div></div>');
+      $('#backup-' + modeName + '-div').append(newBackupItem);
+      
+      var keyValuePair = {};
+      keyValuePair["backup-public-qrcode-" + itemName] = key.address;
+      keyValuePair["backup-private-qrcode-" + itemName] = key.eckey.getExportedPrivateKey();
+      ninja.qrCode.showQrCode(keyValuePair, 2);
+
       if (++receivedBalances == interval)
       {
         // Send balance query
@@ -382,6 +392,7 @@ $(document).ready(function() {
   $('#wallet-div').hide();
   $('#payment-div').hide();
   $('#publickey-div').hide();
+  $('#backup-div').hide();
 
   // Update navigation bar when clicked  
   $(document).ready(function () {
@@ -395,19 +406,29 @@ $(document).ready(function() {
   $('#addresses-nav').click(function(){
     $('#payment-div').hide();
     $('#publickey-div').hide();
+    $('#backup-div').hide();
     $('#addresses-div').show();
   });
   
   $('#payment-nav').click(function(){
     $('#addresses-div').hide();
     $('#publickey-div').hide();
+    $('#backup-div').hide();
     $('#payment-div').show();
   });
   
   $('#publickey-nav').click(function(){
     $('#addresses-div').hide();
     $('#payment-div').hide();
+    $('#backup-div').hide();
     $('#publickey-div').show();
+  });
+
+  $('#backup-nav').click(function(){
+    $('#addresses-div').hide();
+    $('#payment-div').hide();
+    $('#publickey-div').hide();
+    $('#backup-div').show();
   });
   
   $('#txSend').click(function(){

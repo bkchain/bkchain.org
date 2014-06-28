@@ -28,7 +28,7 @@ function electrum_extend_chain(pubKey, privKey, mode, n, fromPrivKey) {
     var addr = new Bitcoin.Address(h160);
     var sec = secexp ? new Bitcoin.Address(newPriv) : '';
     if (secexp)
-        sec.version = 128;
+        sec.version = wif_version;
 
     return [addr.toString(), sec.toString(), newPub, newPriv];
 }

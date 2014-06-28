@@ -15,7 +15,7 @@ Bitcoin.ECKey = (function () {
       // Prepend zero byte to prevent interpretation as negative integer
       this.priv = BigInteger.fromByteArrayUnsigned(input);
     } else if ("string" == typeof input) {
-      if (input.length == 51 && input[0] == '5') {
+      if (input.length == 51) {
         // Base58 encoded private key
         this.priv = BigInteger.fromByteArrayUnsigned(ECKey.decodeString(input));
       } else {
@@ -75,7 +75,7 @@ Bitcoin.ECKey = (function () {
   ECKey.prototype.getExportedPrivateKey = function () {
     var hash = this.priv.toByteArrayUnsigned();
     while (hash.length < 32) hash.unshift(0);
-    hash.unshift(0x80);
+    hash.unshift(wif_version);
     var checksum = Crypto.SHA256(Crypto.SHA256(hash, {asBytes: true}), {asBytes: true});
     var bytes = hash.concat(checksum.slice(0,4));
     return Bitcoin.Base58.encode(bytes);
@@ -120,7 +120,7 @@ Bitcoin.ECKey = (function () {
 
     var version = hash.shift();
 
-    if (version != 0x80) {
+    if (version != wif_version) {
       throw "Version "+version+" not supported!";
     }
 

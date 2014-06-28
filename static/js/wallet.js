@@ -258,28 +258,43 @@ var wallet = new function() {
   
     var keys = get_keys();
     var total_balance = 0;
-    query_url("https://bkchain.org/" + current_currency + "/api/v1/address/balance/" + keys.map(function(x) { return x.address }).join() + "?confirmations=0", function(balance_results) {
-      for (var i = 0; i < balance_results.length; ++i) {
-        var balance_result = balance_results[i];
+    
+    var addressesToCheck = keys.map(function(x) { return x.address });
+    
+    // Query unspent outputs (grouped by 10)
+    var addressesGroupSize = 10;
+    var addressesGroupCount = ((addressesToCheck.length + addressesGroupSize - 1) / addressesGroupSize) | 0;
+    var addressesGroupCountLeft = addressesGroupCount;
+    
+    for (var i = 0; i < addressesGroupCount; ++i) {
+      // TODO: Query more incrementally instead of throwing everything right away?
+      var addressesSlice = addressesToCheck.slice(i * addressesGroupSize, Math.min(addressesGroupSize, addressesToCheck.length - i * addressesGroupSize));
 
-        var key = keys[i];
-        key.balance = balance_result.balance;
-        key.txcount = balance_result.txcount;
-        key.item.find('td.address-balance').first().text(balance_result.balance / coinfactor);
-        key.item.find('td.address-tx').first().html('<a href="' + script_name + '/address/' + key.address + '" target="_blank">' + balance_result.txcount + '</a>');
-        
-        if (!key.hasOwnProperty('striked') && key.balance == 0 && key.txcount > 0) {
-          // Strike used addresses
-          var addrElt = key.item.find('td.address').first();
-          addrElt.wrapInner("<strike>");
-          key.striked = true;
+      query_url("https://bkchain.org/" + current_currency + "/api/v1/address/balance/" + addressesSlice.join() + "?confirmations=0", function(balance_results) {
+        for (var i = 0; i < balance_results.length; ++i) {
+          var balance_result = balance_results[i];
+      
+          var key = keys[i];
+          key.balance = balance_result.balance;
+          key.txcount = balance_result.txcount;
+          key.item.find('td.address-balance').first().text(balance_result.balance / coinfactor);
+          key.item.find('td.address-tx').first().html('<a href="' + script_name + '/address/' + key.address + '" target="_blank">' + balance_result.txcount + '</a>');
+          
+          if (!key.hasOwnProperty('striked') && key.balance == 0 && key.txcount > 0) {
+            // Strike used addresses
+            var addrElt = key.item.find('td.address').first();
+            addrElt.wrapInner("<strike>");
+            key.striked = true;
+          }
+          
+          total_balance += key.balance;
         }
-        
-        total_balance += key.balance;
-      }
-      $('#address-refresh-icon').fadeOut();
-      $('#total-balance').text(total_balance / coinfactor);
-    });
+        if (--addressesGroupCountLeft == 0) {
+          $('#address-refresh-icon').fadeOut();
+          $('#total-balance').text(total_balance / coinfactor);
+        }
+      });
+    }
   }
   
   function sendTx() {

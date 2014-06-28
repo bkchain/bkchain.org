@@ -64,81 +64,99 @@ var wallet = new function() {
       return false;
     }
 
-    // Query unspent outputs
-    query_url("https://bkchain.org/" + current_currency + "/api/v1/address/unspent/" + inputKeys.map(function(x) { return x.address }).join() + "?confirmations=0", function(unspent_results) {
-      var inputs = [];
-      var total = 0;
-      var valid = false;
-      
-      // Find enough inputs to cover those funds
-      for (var i = 0; i < unspent_results.length; ++i) {
-        var unspent_address = unspent_results[i];
-        for (var j = 0; j < unspent_address.unspent.length; ++j) {
-          var unspent_output = unspent_address.unspent[j];
-          total += unspent_output.v;
-          inputs.push({ output: unspent_output, address: unspent_address.address });
-          var script = new Bitcoin.Script(Crypto.util.hexToBytes(unspent_output.script));
-          if (total >= amount + fees + donate) {
-            valid = true;
-            break;
-          }
-        }
-      }
-      
-      // We could find enough funds from address but when checking unspent outputs it didn't match?
-      // Either something changed on us in the meantime (could happen) or it's a bug.
-      if (!valid) {
-        $('#txJSON').val("error: Not enough funds (could not find unspent outputs)");
-        return;
-      }
-        
-      var change = total - amount - fees - donate;
-        
-      TX.parseInputsBKC(inputs);
-      TX.initMultiple(keys.map(function (x) { return x.eckey; }));
-      
-      // Main output
-      TX.addOutput(addr, amount);
-      
-      // Change
-      if (change > 0) {
-        // Default: select first element
-        var changeAddr = change_keys[0].address;
-        for (var i = 0; i < change_keys.length; ++i) {
-          var key = change_keys[i];
-          if (key.txcount == 0) {
-            changeAddr = key.address;
-            break;
-          }
-        }
+    // Find list of addresses with balances
+    var addressesToCheck = inputKeys.filter(function(x) { return x.balance > 0; }).map(function(x) { return x.address });
     
-        TX.addOutput(changeAddr, change);
-      }
+    // Query unspent outputs (grouped by 10)
+    var addressesGroupSize = 10;
+    var addressesGroupCount = (addressesToCheck.length + addressesGroupSize - 1) / addressesGroupSize;
+    var enoughFundsFound = false;
+    var inputs = [];
+    var total = 0;
+    var valid = false;
+    
+    for (var i = 0; i < addressesGroupCount; ++i) {
+      // TODO: Query more incrementally instead of throwing everything right away?
+      var addressesSlice = addressesToCheck.slice(i * addressesGroupSize, Math.min(addressesGroupSize, addressesToCheck.length - i * addressesGroupSize));
+      query_url("https://bkchain.org/" + current_currency + "/api/v1/address/unspent/" + addressesSlice.join() + "?confirmations=0", function(unspent_results) {
       
-      // Donation
-      if (donateAddress !== "" && donate > 0)
-        TX.addOutput(donateAddress, donate);
-      
-      try {
-        var sendTx = TX.construct();
-        var txJSON = TX.toBBE(sendTx);
-        var buf = sendTx.serialize();
-        var txHex = Crypto.util.bytesToHex(buf);
-      
-        $('#txJSON').val(txJSON);
-        $('#txHex').val(txHex);
-      
-        $('#sendPayment').addClass('btn-primary');
-        $('#sendPayment').removeAttr('disabled');
-      }
-      catch (e) {
-        if (e instanceof BitcoinAddressException) {
-          $('#txJSON').val("Address error: " + e.message);
-        } else {
-          $('#txJSON').val("TX error: " + e);
+        // Already found solution in another of the callbacks
+        if (valid) {
+          return;
         }
-      }
-    });
+        
+        // Find enough inputs to cover those funds
+        for (var i = 0; i < unspent_results.length; ++i) {
+          var unspent_address = unspent_results[i];
+          for (var j = 0; j < unspent_address.unspent.length; ++j) {
+            var unspent_output = unspent_address.unspent[j];
+            total += unspent_output.v;
+            inputs.push({ output: unspent_output, address: unspent_address.address });
+            var script = new Bitcoin.Script(Crypto.util.hexToBytes(unspent_output.script));
+            if (total >= amount + fees + donate) {
+              valid = true;
+              break;
+            }
+          }
+        }
+        
+        // We could find enough funds from address but when checking unspent outputs it didn't match?
+        // Either something changed on us in the meantime (could happen) or it's a bug.
+        if (!valid) {
+          if (--addressesGroupCount == 0) {
+            $('#txJSON').val("error: Not enough funds (could not find unspent outputs)");
+          }
+          return;
+        }
+          
+        var change = total - amount - fees - donate;
+          
+        TX.parseInputsBKC(inputs);
+        TX.initMultiple(keys.map(function (x) { return x.eckey; }));
+        
+        // Main output
+        TX.addOutput(addr, amount);
+        
+        // Change
+        if (change > 0) {
+          // Default: select first element
+          var changeAddr = change_keys[0].address;
+          for (var i = 0; i < change_keys.length; ++i) {
+            var key = change_keys[i];
+            if (key.txcount == 0) {
+              changeAddr = key.address;
+              break;
+            }
+          }
+        
+          TX.addOutput(changeAddr, change);
+        }
+        
+        // Donation
+        if (donateAddress !== "" && donate > 0)
+          TX.addOutput(donateAddress, donate);
+        
+        try {
+          var sendTx = TX.construct();
+          var txJSON = TX.toBBE(sendTx);
+          var buf = sendTx.serialize();
+          var txHex = Crypto.util.bytesToHex(buf);
+        
+          $('#txJSON').val(txJSON);
+          $('#txHex').val(txHex);
+        
+          $('#sendPayment').addClass('btn-primary');
+          $('#sendPayment').removeAttr('disabled');
+        }
+        catch (e) {
+          if (e instanceof BitcoinAddressException) {
+            $('#txJSON').val("Address error: " + e.message);
+          } else {
+            $('#txJSON').val("TX error: " + e);
+          }
+        }
+      });
+    }
   }
   
   function addressRefreshLoop() {

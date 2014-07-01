@@ -78,7 +78,7 @@ var wallet = new function() {
     
     for (var i = 0; i < addressesGroupCount; ++i) {
       // TODO: Query more incrementally instead of throwing everything right away?
-      var addressesSlice = addressesToCheck.slice(i * addressesGroupSize, Math.min(addressesGroupSize, addressesToCheck.length - i * addressesGroupSize));
+      var addressesSlice = addressesToCheck.slice(i * addressesGroupSize, Math.min((i + 1) * addressesGroupSize, addressesToCheck.length));
       query_url("https://bkchain.org/" + current_currency + "/api/v1/address/unspent/" + addressesSlice.join() + "?confirmations=0", function(unspent_results) {
       
         // Already found solution in another of the callbacks
@@ -278,7 +278,7 @@ var wallet = new function() {
     
     for (var i = 0; i < addressesGroupCount; ++i) {
       // TODO: Query more incrementally instead of throwing everything right away?
-      var addressesSlice = addressesToCheck.slice(i * addressesGroupSize, Math.min(addressesGroupSize, addressesToCheck.length - i * addressesGroupSize));
+      var addressesSlice = addressesToCheck.slice(i * addressesGroupSize, Math.min((i + 1) * addressesGroupSize, addressesToCheck.length));
 
       query_url("https://bkchain.org/" + current_currency + "/api/v1/address/balance/" + addressesSlice.join() + "?confirmations=0", function(balance_results) {
         for (var i = 0; i < balance_results.length; ++i) {

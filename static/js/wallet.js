@@ -282,30 +282,33 @@ var wallet = new function() {
       // TODO: Query more incrementally instead of throwing everything right away?
       var addressesSlice = addressesToCheck.slice(i * addressesGroupSize, Math.min((i + 1) * addressesGroupSize, addressesToCheck.length));
 
-      query_url("https://bkchain.org/" + current_currency + "/api/v1/address/balance/" + addressesSlice.join() + "?confirmations=0", function(balance_results) {
-        for (var j = 0; j < balance_results.length; ++j) {
-          var balance_result = balance_results[j];
-      
-          var key = keys[i * addressesGroupSize + j];
-          key.balance = balance_result.balance;
-          key.txcount = balance_result.txcount;
-          key.item.find('td.address-balance').first().text(balance_result.balance / coinfactor);
-          key.item.find('td.address-tx').first().html('<a href="' + script_name + '/address/' + key.address + '" target="_blank">' + balance_result.txcount + '</a>');
-          
-          if (!key.hasOwnProperty('striked') && key.balance == 0 && key.txcount > 0) {
-            // Strike used addresses
-            var addrElt = key.item.find('td.address').first();
-            addrElt.wrapInner("<strike>");
-            key.striked = true;
+      (function() {
+        var i1 = i; // capture variable right away
+        query_url("https://bkchain.org/" + current_currency + "/api/v1/address/balance/" + addressesSlice.join() + "?confirmations=0", function(balance_results) {
+          for (var j = 0; j < balance_results.length; ++j) {
+            var balance_result = balance_results[j];
+        
+            var key = keys[i1 * addressesGroupSize + j];
+            key.balance = balance_result.balance;
+            key.txcount = balance_result.txcount;
+            key.item.find('td.address-balance').first().text(balance_result.balance / coinfactor);
+            key.item.find('td.address-tx').first().html('<a href="address/' + key.address + '" target="_blank">' + balance_result.txcount + '</a>');
+            
+            if (!key.hasOwnProperty('striked') && key.balance == 0 && key.txcount > 0) {
+              // Strike used addresses
+              var addrElt = key.item.find('td.address').first();
+              addrElt.wrapInner("<strike>");
+              key.striked = true;
+            }
+            
+            total_balance += key.balance;
           }
-          
-          total_balance += key.balance;
-        }
-        if (--addressesGroupCountLeft == 0) {
-          $('#address-refresh-icon').fadeOut();
-          $('#total-balance').text(total_balance / coinfactor);
-        }
-      });
+          if (--addressesGroupCountLeft == 0) {
+            $('#address-refresh-icon').fadeOut();
+            $('#total-balance').text(total_balance / coinfactor);
+          }
+        });
+      })();
     }
   }
   

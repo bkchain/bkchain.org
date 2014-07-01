@@ -51,6 +51,8 @@ var wallet = new function() {
     // TODO: User-specified addresses?
     for (var i = 0; i < keys.length; ++i) {
       var key = keys[i];
+      if (key.balance == 0)
+        continue;
       total += key.balance;
       inputKeys.push(key);
       if (total >= amount + fees + donate) {
@@ -113,7 +115,7 @@ var wallet = new function() {
         var change = total - amount - fees - donate;
           
         TX.parseInputsBKC(inputs);
-        TX.initMultiple(keys.map(function (x) { return x.eckey; }));
+        TX.initMultiple(inputKeys.map(function (x) { return x.eckey; }));
         
         // Main output
         TX.addOutput(addr, amount);

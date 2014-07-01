@@ -283,10 +283,10 @@ var wallet = new function() {
       var addressesSlice = addressesToCheck.slice(i * addressesGroupSize, Math.min((i + 1) * addressesGroupSize, addressesToCheck.length));
 
       query_url("https://bkchain.org/" + current_currency + "/api/v1/address/balance/" + addressesSlice.join() + "?confirmations=0", function(balance_results) {
-        for (var i = 0; i < balance_results.length; ++i) {
-          var balance_result = balance_results[i];
+        for (var j = 0; j < balance_results.length; ++j) {
+          var balance_result = balance_results[j];
       
-          var key = keys[i];
+          var key = keys[i * addressesGroupSize + j];
           key.balance = balance_result.balance;
           key.txcount = balance_result.txcount;
           key.item.find('td.address-balance').first().text(balance_result.balance / coinfactor);
